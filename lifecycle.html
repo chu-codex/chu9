@@ -1,0 +1,2586 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>5月跑得好素材生命周期复盘</title>
+  <style>
+    :root{
+      --green:#42bdb5;
+      --green-dark:#15938b;
+      --mint:#eaf8f6;
+      --mint-2:#f6fcfb;
+      --ink:#17242f;
+      --muted:#687780;
+      --line:#d6e8e5;
+      --blue:#4d8fd3;
+      --orange:#e8903a;
+      --red:#d85c4a;
+      --bg:#f4f8f8;
+      --white:#fff;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      color:var(--ink);
+      background:var(--bg);
+      font:14px/1.68 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif;
+    }
+    .shell{max-width:1280px;margin:0 auto;background:#fff;min-height:100vh;box-shadow:0 20px 60px rgba(23,36,47,.08)}
+    .hero{
+      background:linear-gradient(135deg,#42bdb5 0%,#55c5bf 55%,#6ed0ca 100%);
+      color:#fff;
+      padding:48px 56px 42px;
+      position:relative;
+      overflow:hidden;
+    }
+    .hero:before,.hero:after{
+      content:"";
+      position:absolute;
+      border:42px solid rgba(255,255,255,.18);
+      border-radius:50%;
+      width:280px;height:280px;
+    }
+    .hero:before{left:-88px;top:-74px}
+    .hero:after{right:-70px;bottom:-120px}
+    .brand{font-size:22px;font-weight:700;letter-spacing:.02em;margin-bottom:54px;position:relative;z-index:1}
+    h1{font-size:38px;line-height:1.18;margin:0 0 18px;position:relative;z-index:1}
+    .hero p{font-size:16px;margin:0;opacity:.92;position:relative;z-index:1}
+    .content{padding:34px 48px 64px}
+    .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+    .card{border:1px solid var(--line);background:var(--mint-2);padding:18px 20px;border-left:5px solid var(--green)}
+    .card small{display:block;color:var(--muted);font-size:13px;margin-bottom:8px}
+    .card strong{display:block;font-size:26px;line-height:1.1}
+    .section-title{display:flex;align-items:end;gap:14px;margin:34px 0 16px}
+    .section-title h2{font-size:24px;margin:0}
+    .section-title span{color:var(--muted);font-size:13px}
+    .bar-list{display:grid;gap:10px;border:1px solid var(--line);padding:18px;background:#fff;margin-bottom:28px}
+    .bar-row{display:grid;grid-template-columns:280px 1fr 120px;gap:16px;align-items:center}
+    .bar-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .track{height:13px;background:#e8f0ef;overflow:hidden}
+    .fill{height:100%;background:var(--green)}
+    .bar-value{text-align:right;font-weight:700}
+    .material{border:1px solid var(--line);background:#fff;margin:18px 0 26px}
+    .material-top{display:grid;grid-template-columns:62px 1fr 420px;gap:18px;padding:20px 22px;border-bottom:1px solid var(--line);align-items:start}
+    .rank{width:44px;height:44px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800}
+    .mtitle h3{font-size:20px;line-height:1.35;margin:0 0 8px}
+    .meta{color:var(--muted);display:flex;flex-wrap:wrap;gap:12px}
+    .monthly{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .metric{background:var(--mint-2);border:1px solid var(--line);padding:10px 12px}
+    .metric small{display:block;color:var(--muted);font-size:12px}
+    .metric strong{font-size:17px}
+    .stages{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:18px 22px}
+    .stage{border:1px solid var(--line);background:#fff}
+    .stage.d0{border-top:4px solid var(--blue)}
+    .stage.d3{border-top:4px solid var(--orange)}
+    .stage.d7{border-top:4px solid var(--green)}
+    .stage-head{display:flex;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);font-weight:700}
+    .stage-head b{font-size:13px;color:var(--muted)}
+    .stage-range{padding:8px 14px 0;color:var(--muted);font-size:12px}
+    .stage-live{padding:10px 14px;color:var(--muted);min-height:44px}
+    .stage-grid{display:grid;grid-template-columns:repeat(2,1fr);border-top:1px solid var(--line)}
+    .stage-grid div{padding:10px 14px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+    .stage-grid div:nth-child(2n){border-right:0}
+    .stage-grid small{display:block;color:var(--muted)}
+    .stage-grid strong{font-size:16px}
+    .trend-block{margin:0 22px 18px;border:1px solid var(--line);background:#fff}
+    .trend-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--mint-2)}
+    .trend-head b{display:block;font-size:16px}
+    .trend-head span{color:var(--muted);font-size:12px}
+    .trend-summary{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .trend-summary span{background:#fff;border:1px solid var(--line);padding:4px 8px;color:var(--ink);font-weight:700}
+    .trend-bars{display:grid;grid-template-columns:repeat(15,1fr);gap:8px;padding:18px 16px 14px;align-items:end}
+    .trend-day{min-width:0;text-align:center}
+    .trend-value{height:18px;font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .trend-track{height:118px;background:#edf4f3;display:flex;align-items:end;justify-content:center}
+    .trend-fill{width:100%;background:linear-gradient(180deg,#6bd0c9 0%,var(--green) 100%);min-height:0}
+    .trend-label{font-size:11px;color:var(--muted);margin-top:6px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;padding:0 22px 20px}
+    .tag{background:var(--mint);color:var(--green-dark);padding:5px 10px;border:1px solid var(--line);font-weight:700}
+    .conclusion{margin:0 22px 22px;padding:14px 16px;border-left:5px solid var(--green);background:var(--mint-2);display:grid;gap:6px}
+    .conclusion b{font-size:16px}
+    .conclusion span{color:var(--ink)}
+    .table-wrap{overflow:auto;border:1px solid var(--line);background:#fff}
+    table{border-collapse:collapse;width:100%;min-width:1180px}
+    th,td{border-bottom:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
+    th{background:var(--mint);font-weight:800;white-space:nowrap}
+    td.num{text-align:right;white-space:nowrap}
+    .good{color:var(--green-dark);font-weight:800}
+    .weak{color:var(--red);font-weight:800}
+    .note{margin-top:18px;color:var(--muted);font-size:13px}
+    @media (max-width:900px){
+      .hero{padding:34px 24px}
+      .content{padding:24px 18px}
+      .cards,.stages{grid-template-columns:1fr}
+      .material-top{grid-template-columns:1fr}
+      .monthly{grid-template-columns:repeat(2,1fr)}
+      .bar-row{grid-template-columns:1fr}
+      .trend-head{display:block}
+      .trend-summary{justify-content:flex-start;margin-top:10px}
+      .trend-bars{overflow-x:auto;grid-template-columns:repeat(15,42px)}
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="brand">inman 茵曼</div>
+      <h1>5月跑得好素材生命周期复盘</h1>
+      <p>按“冷启动 / 放量 / 衰退”观察素材从首发到起量、回落和长尾的关键变化；直播承接按主推款与短视频款式匹配计算</p>
+    </section>
+    <section class="content">
+      <div class="cards">
+        <div class="card"><small>入选素材</small><strong>10条</strong></div>
+        <div class="card"><small>平均月ROI</small><strong>23.15</strong></div>
+        <div class="card"><small>D3仍高效</small><strong>7条</strong></div>
+        <div class="card"><small>D7仍高效</small><strong>6条</strong></div>
+      </div>
+
+      <div class="section-title">
+        <h2>核心观察</h2>
+        <span>筛选口径：5月消耗≥¥1,000 且 ROI≥20，按GMV倒序</span>
+      </div>
+      <div class="bar-list">
+        
+          <div class="bar-row">
+            <div class="bar-name">1. 谁都不缺衣服，缺的是换装的好心情#夏季新款 #谁...</div>
+            <div class="track"><div class="fill" style="width:100%"></div></div>
+            <div class="bar-value">¥289,790</div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-name">2. 怕热的姐妹，一定要入这款凉感面料 #穿搭技巧 #...</div>
+            <div class="track"><div class="fill" style="width:96.83992600850166%"></div></div>
+            <div class="bar-value">¥280,632</div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-name">3. 简约大气不挑人，上班穿得体又高级 #面料舒适透气...</div>
+            <div class="track"><div class="fill" style="width:62.745870674303696%"></div></div>
+            <div class="bar-value">¥181,831</div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-name">4. 压力可以放一放，快乐不能缺席 #遮肉显瘦穿搭 #...</div>
+            <div class="track"><div class="fill" style="width:32.0502412004829%"></div></div>
+            <div class="bar-value">¥92,878</div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-name">5. 颜色很克制，线条很干净#夏季新款 #谁穿谁好看#...</div>
+            <div class="track"><div class="fill" style="width:29.75670834799194%"></div></div>
+            <div class="bar-value">¥86,232</div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-name">6. 穿的舒服了，人就松弛了#夏季新款 #谁穿谁好看 ...</div>
+            <div class="track"><div class="fill" style="width:22.258845671202305%"></div></div>
+            <div class="bar-value">¥64,504</div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-name">7. 没有弯弯绕绕，预热也给大家直降不啰嗦 #名媛风 ...</div>
+            <div class="track"><div class="fill" style="width:21.98568929471526%"></div></div>
+            <div class="bar-value">¥63,712</div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-name">8. 夏天怕热怕闷的姐妹看过来！ #上班穿搭 #春夏搭...</div>
+            <div class="track"><div class="fill" style="width:21.770785435869865%"></div></div>
+            <div class="bar-value">¥63,090</div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-name">9. 风一吹，上身是凉快的舒服的#夏季新款 #面料舒适...</div>
+            <div class="track"><div class="fill" style="width:13.776504748869053%"></div></div>
+            <div class="bar-value">¥39,923</div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-name">10. 岁月无声，用心活着，自带光芒 #日系甜美 #小个...</div>
+            <div class="track"><div class="fill" style="width:9.82965771254051%"></div></div>
+            <div class="bar-value">¥28,485</div>
+          </div>
+      </div>
+
+      <div class="section-title">
+        <h2>生命周期明细</h2>
+        <span>冷启动、放量、衰退均按趋势阶段汇总；承接贡献看素材对直播间GMV增量的解释力度</span>
+      </div>
+      
+        <article class="material" id="m-1">
+          <div class="material-top">
+            <div class="rank">1</div>
+            <div class="mtitle">
+              <h3>谁都不缺衣服，缺的是换装的好心情#夏季新款 #谁穿谁好看 #遮肉显瘦 #小个子穿搭</h3>
+              <div class="meta">
+                <span>发布时间：2026-05-20 21:20:20</span>
+                <span>类目：针织衫</span>
+                <span>视频关联款式：D18628693</span>
+                <span>投放天数：12天</span>
+              </div>
+            </div>
+            <div class="monthly">
+              <div class="metric"><small>5月消耗</small><strong>¥12,147</strong></div>
+              <div class="metric"><small>5月GMV</small><strong>¥289,790</strong></div>
+              <div class="metric"><small>5月ROI</small><strong>23.86</strong></div>
+              <div class="metric"><small>5月进房</small><strong>28,943</strong></div>
+            </div>
+          </div>
+          <div class="stages">
+            
+    <div class="stage d0">
+      <div class="stage-head">
+        <span>冷启动</span>
+        <b>D0</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 0.8%｜成交占比 1.1%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥41</strong></div>
+        <div><small>GMV</small><strong>¥1,133</strong></div>
+        <div><small>ROI</small><strong>27.39</strong></div>
+        <div><small>进房</small><strong>155</strong></div>
+        <div><small>CTR</small><strong>4.18%</strong></div>
+        <div><small>CVR</small><strong>4.52%</strong></div>
+      </div>
+    </div>
+  
+            
+    <div class="stage d3">
+      <div class="stage-head">
+        <span>放量</span>
+        <b>D1-D4</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 30.4%｜成交占比 28.1%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥8,898</strong></div>
+        <div><small>GMV</small><strong>¥199,361</strong></div>
+        <div><small>ROI</small><strong>22.40</strong></div>
+        <div><small>进房</small><strong>19,706</strong></div>
+        <div><small>CTR</small><strong>3.58%</strong></div>
+        <div><small>CVR</small><strong>6.33%</strong></div>
+      </div>
+    </div>
+  
+            
+    <div class="stage d7">
+      <div class="stage-head">
+        <span>衰退</span>
+        <b>D5-D8</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 9.5%｜成交占比 10.9%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥1,670</strong></div>
+        <div><small>GMV</small><strong>¥47,664</strong></div>
+        <div><small>ROI</small><strong>28.55</strong></div>
+        <div><small>进房</small><strong>4,896</strong></div>
+        <div><small>CTR</small><strong>5.46%</strong></div>
+        <div><small>CVR</small><strong>6.11%</strong></div>
+      </div>
+    </div>
+  
+          </div>
+          
+    <div class="trend-block">
+      <div class="trend-head">
+        <div>
+          <b>发布后15天消耗趋势</b>
+          <span>用连续曲线看素材首发、放量和衰退节奏</span>
+        </div>
+        <div class="trend-summary">
+          <span>15天消耗 ¥13,820</span>
+          <span>峰值 D2 ¥2,871</span>
+          <span>峰值贡献 20.8%</span>
+          <span>前4天贡献 54.3%</span>
+          <span>有消耗 15天</span>
+        </div>
+      </div>
+      <div class="trend-bars">
+        
+          <div class="trend-day" title="2026-05-20｜消耗¥41｜GMV¥1,133｜ROI27.39">
+            <div class="trend-value">41</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D0</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-21｜消耗¥2,420｜GMV¥65,678｜ROI27.14">
+            <div class="trend-value">2,420</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:84.27610084361437%"></div>
+            </div>
+            <div class="trend-label">D1</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-22｜消耗¥2,871｜GMV¥56,673｜ROI19.74">
+            <div class="trend-value">2,871</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:100%"></div>
+            </div>
+            <div class="trend-label">D2</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-23｜消耗¥2,174｜GMV¥47,147｜ROI21.69">
+            <div class="trend-value">2,174</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:75.71212617294442%"></div>
+            </div>
+            <div class="trend-label">D3</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-24｜消耗¥1,434｜GMV¥29,862｜ROI20.83">
+            <div class="trend-value">1,434</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:49.94705640582659%"></div>
+            </div>
+            <div class="trend-label">D4</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-25｜消耗¥561｜GMV¥13,922｜ROI24.80">
+            <div class="trend-value">561</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:19.554995158447635%"></div>
+            </div>
+            <div class="trend-label">D5</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-26｜消耗¥365｜GMV¥10,670｜ROI29.21">
+            <div class="trend-value">365</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:12.723529944478889%"></div>
+            </div>
+            <div class="trend-label">D6</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-27｜消耗¥385｜GMV¥10,826｜ROI28.09">
+            <div class="trend-value">385</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:13.424335941037555%"></div>
+            </div>
+            <div class="trend-label">D7</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-28｜消耗¥357｜GMV¥12,247｜ROI34.27">
+            <div class="trend-value">357</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:12.4487108931445%"></div>
+            </div>
+            <div class="trend-label">D8</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-29｜消耗¥728｜GMV¥20,589｜ROI28.27">
+            <div class="trend-value">728</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:25.368689437056336%"></div>
+            </div>
+            <div class="trend-label">D9</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-30｜消耗¥265｜GMV¥6,425｜ROI24.25">
+            <div class="trend-value">265</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:9.227859476555045%"></div>
+            </div>
+            <div class="trend-label">D10</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-31｜消耗¥544｜GMV¥14,617｜ROI26.85">
+            <div class="trend-value">544</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:18.96251454207274%"></div>
+            </div>
+            <div class="trend-label">D11</div>
+          </div>
+        
+          <div class="trend-day" title="2026-06-01｜消耗¥420｜GMV¥7,957｜ROI18.93">
+            <div class="trend-value">420</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:14.640645354547924%"></div>
+            </div>
+            <div class="trend-label">D12</div>
+          </div>
+        
+          <div class="trend-day" title="2026-06-02｜消耗¥420｜GMV¥11,466｜ROI27.27">
+            <div class="trend-value">420</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:14.645870051341353%"></div>
+            </div>
+            <div class="trend-label">D13</div>
+          </div>
+        
+          <div class="trend-day" title="2026-06-03｜消耗¥832｜GMV¥23,225｜ROI27.91">
+            <div class="trend-value">832</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:28.98801106242468%"></div>
+            </div>
+            <div class="trend-label">D14</div>
+          </div>
+        
+      </div>
+    </div>
+  
+          <div class="tags"><span class="tag">放量周期：D1-D4</span><span class="tag">峰值贡献：20.8%</span><span class="tag">前4天贡献：54.3%</span><span class="tag">长尾贡献：45.7%</span><span class="tag">生命周期：15天</span></div>
+          <div class="conclusion">
+            <b>【二次放量型素材】</b>
+            <span>D0启动 → D2峰值 → D5衰退 → D9二次放量；D2达到峰值，峰值贡献20.8%；前4天贡献54.3%，后续长尾贡献45.7%；生命周期15天，具备持续获量能力，建议纳入复刻素材库。</span>
+          </div>
+        </article>
+      
+        <article class="material" id="m-2">
+          <div class="material-top">
+            <div class="rank">2</div>
+            <div class="mtitle">
+              <h3>怕热的姐妹，一定要入这款凉感面料 #穿搭技巧 #面料舒适透气 #小个子穿搭 #通勤穿搭 #谁穿谁好看</h3>
+              <div class="meta">
+                <span>发布时间：2026-05-21 11:45:49</span>
+                <span>类目：针织衫</span>
+                <span>视频关联款式：D18628693</span>
+                <span>投放天数：11天</span>
+              </div>
+            </div>
+            <div class="monthly">
+              <div class="metric"><small>5月消耗</small><strong>¥10,318</strong></div>
+              <div class="metric"><small>5月GMV</small><strong>¥280,632</strong></div>
+              <div class="metric"><small>5月ROI</small><strong>27.20</strong></div>
+              <div class="metric"><small>5月进房</small><strong>23,651</strong></div>
+            </div>
+          </div>
+          <div class="stages">
+            
+    <div class="stage d0">
+      <div class="stage-head">
+        <span>冷启动</span>
+        <b>D0</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 0.9%｜成交占比 1.8%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥56</strong></div>
+        <div><small>GMV</small><strong>¥2,714</strong></div>
+        <div><small>ROI</small><strong>48.05</strong></div>
+        <div><small>进房</small><strong>286</strong></div>
+        <div><small>CTR</small><strong>3.52%</strong></div>
+        <div><small>CVR</small><strong>5.94%</strong></div>
+      </div>
+    </div>
+  
+            
+    <div class="stage d3">
+      <div class="stage-head">
+        <span>放量</span>
+        <b>D1-D8</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 20.3%｜成交占比 22.9%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥9,273</strong></div>
+        <div><small>GMV</small><strong>¥252,360</strong></div>
+        <div><small>ROI</small><strong>27.22</strong></div>
+        <div><small>进房</small><strong>21,267</strong></div>
+        <div><small>CTR</small><strong>2.86%</strong></div>
+        <div><small>CVR</small><strong>7.44%</strong></div>
+      </div>
+    </div>
+  
+            
+    <div class="stage d7">
+      <div class="stage-head">
+        <span>衰退</span>
+        <b>-</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 -｜成交占比 -</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥0</strong></div>
+        <div><small>GMV</small><strong>¥0</strong></div>
+        <div><small>ROI</small><strong>-</strong></div>
+        <div><small>进房</small><strong>0</strong></div>
+        <div><small>CTR</small><strong>-</strong></div>
+        <div><small>CVR</small><strong>-</strong></div>
+      </div>
+    </div>
+  
+          </div>
+          
+    <div class="trend-block">
+      <div class="trend-head">
+        <div>
+          <b>发布后15天消耗趋势</b>
+          <span>用连续曲线看素材首发、放量和衰退节奏</span>
+        </div>
+        <div class="trend-summary">
+          <span>15天消耗 ¥13,250</span>
+          <span>峰值 D3 ¥2,257</span>
+          <span>峰值贡献 17.0%</span>
+          <span>前4天贡献 25.8%</span>
+          <span>有消耗 15天</span>
+        </div>
+      </div>
+      <div class="trend-bars">
+        
+          <div class="trend-day" title="2026-05-21｜消耗¥56｜GMV¥2,714｜ROI48.05">
+            <div class="trend-value">56</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D0</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-22｜消耗¥569｜GMV¥19,548｜ROI34.35">
+            <div class="trend-value">569</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:25.21747608095472%"></div>
+            </div>
+            <div class="trend-label">D1</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-23｜消耗¥538｜GMV¥24,795｜ROI46.10">
+            <div class="trend-value">538</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:23.83573299299379%"></div>
+            </div>
+            <div class="trend-label">D2</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-24｜消耗¥2,257｜GMV¥60,215｜ROI26.68">
+            <div class="trend-value">2,257</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:100%"></div>
+            </div>
+            <div class="trend-label">D3</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-25｜消耗¥1,554｜GMV¥45,720｜ROI29.41">
+            <div class="trend-value">1,554</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:68.88419149417035%"></div>
+            </div>
+            <div class="trend-label">D4</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-26｜消耗¥1,153｜GMV¥28,464｜ROI24.69">
+            <div class="trend-value">1,153</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:51.09258742250407%"></div>
+            </div>
+            <div class="trend-label">D5</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-27｜消耗¥1,001｜GMV¥28,258｜ROI28.22">
+            <div class="trend-value">1,001</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:44.372210921885866%"></div>
+            </div>
+            <div class="trend-label">D6</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-28｜消耗¥997｜GMV¥22,521｜ROI22.58">
+            <div class="trend-value">997</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:44.19760964649889%"></div>
+            </div>
+            <div class="trend-label">D7</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-29｜消耗¥1,203｜GMV¥22,838｜ROI18.98">
+            <div class="trend-value">1,203</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:53.3145437544592%"></div>
+            </div>
+            <div class="trend-label">D8</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-30｜消耗¥317｜GMV¥7,781｜ROI24.51">
+            <div class="trend-value">317</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:14.066481429780595%"></div>
+            </div>
+            <div class="trend-label">D9</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-31｜消耗¥672｜GMV¥17,778｜ROI26.47">
+            <div class="trend-value">672</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:29.767301701254556%"></div>
+            </div>
+            <div class="trend-label">D10</div>
+          </div>
+        
+          <div class="trend-day" title="2026-06-01｜消耗¥395｜GMV¥6,105｜ROI15.44">
+            <div class="trend-value">395</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:17.525713804579514%"></div>
+            </div>
+            <div class="trend-label">D11</div>
+          </div>
+        
+          <div class="trend-day" title="2026-06-02｜消耗¥542｜GMV¥14,583｜ROI26.93">
+            <div class="trend-value">542</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:23.99703975502643%"></div>
+            </div>
+            <div class="trend-label">D12</div>
+          </div>
+        
+          <div class="trend-day" title="2026-06-03｜消耗¥1,010｜GMV¥41,429｜ROI41.03">
+            <div class="trend-value">1,010</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:44.74091209224619%"></div>
+            </div>
+            <div class="trend-label">D13</div>
+          </div>
+        
+          <div class="trend-day" title="2026-06-04｜消耗¥985｜GMV¥29,377｜ROI29.82">
+            <div class="trend-value">985</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:43.66184075831904%"></div>
+            </div>
+            <div class="trend-label">D14</div>
+          </div>
+        
+      </div>
+    </div>
+  
+          <div class="tags"><span class="tag">放量周期：D1-D8</span><span class="tag">峰值贡献：17.0%</span><span class="tag">前4天贡献：25.8%</span><span class="tag">长尾贡献：74.2%</span><span class="tag">生命周期：15天</span></div>
+          <div class="conclusion">
+            <b>【二次放量型素材】</b>
+            <span>D0启动 → D3峰值 → D9衰退 → D6二次放量；D3达到峰值，峰值贡献17.0%；前4天贡献25.8%，后续长尾贡献74.2%；生命周期15天，具备持续获量能力，建议纳入复刻素材库。</span>
+          </div>
+        </article>
+      
+        <article class="material" id="m-3">
+          <div class="material-top">
+            <div class="rank">3</div>
+            <div class="mtitle">
+              <h3>简约大气不挑人，上班穿得体又高级 #面料舒适透气 #通勤穿搭 #遮肉显瘦 #通勤穿搭 #穿出高级感</h3>
+              <div class="meta">
+                <span>发布时间：2026-05-21 22:00:00</span>
+                <span>类目：针织衫</span>
+                <span>视频关联款式：D18628693</span>
+                <span>投放天数：11天</span>
+              </div>
+            </div>
+            <div class="monthly">
+              <div class="metric"><small>5月消耗</small><strong>¥9,009</strong></div>
+              <div class="metric"><small>5月GMV</small><strong>¥181,831</strong></div>
+              <div class="metric"><small>5月ROI</small><strong>20.18</strong></div>
+              <div class="metric"><small>5月进房</small><strong>13,149</strong></div>
+            </div>
+          </div>
+          <div class="stages">
+            
+    <div class="stage d0">
+      <div class="stage-head">
+        <span>冷启动</span>
+        <b>D0-D1</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 0.9%｜成交占比 1.5%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥121</strong></div>
+        <div><small>GMV</small><strong>¥4,473</strong></div>
+        <div><small>ROI</small><strong>36.83</strong></div>
+        <div><small>进房</small><strong>575</strong></div>
+        <div><small>CTR</small><strong>2.62%</strong></div>
+        <div><small>CVR</small><strong>4.87%</strong></div>
+      </div>
+    </div>
+  
+            
+    <div class="stage d3">
+      <div class="stage-head">
+        <span>放量</span>
+        <b>D2-D8</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 20.8%｜成交占比 16.7%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥8,086</strong></div>
+        <div><small>GMV</small><strong>¥159,535</strong></div>
+        <div><small>ROI</small><strong>19.73</strong></div>
+        <div><small>进房</small><strong>11,336</strong></div>
+        <div><small>CTR</small><strong>3.63%</strong></div>
+        <div><small>CVR</small><strong>8.78%</strong></div>
+      </div>
+    </div>
+  
+            
+    <div class="stage d7">
+      <div class="stage-head">
+        <span>衰退</span>
+        <b>-</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 -｜成交占比 -</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥0</strong></div>
+        <div><small>GMV</small><strong>¥0</strong></div>
+        <div><small>ROI</small><strong>-</strong></div>
+        <div><small>进房</small><strong>0</strong></div>
+        <div><small>CTR</small><strong>-</strong></div>
+        <div><small>CVR</small><strong>-</strong></div>
+      </div>
+    </div>
+  
+          </div>
+          
+    <div class="trend-block">
+      <div class="trend-head">
+        <div>
+          <b>发布后15天消耗趋势</b>
+          <span>用连续曲线看素材首发、放量和衰退节奏</span>
+        </div>
+        <div class="trend-summary">
+          <span>15天消耗 ¥11,970</span>
+          <span>峰值 D3 ¥2,148</span>
+          <span>峰值贡献 17.9%</span>
+          <span>前4天贡献 33.0%</span>
+          <span>有消耗 15天</span>
+        </div>
+      </div>
+      <div class="trend-bars">
+        
+          <div class="trend-day" title="2026-05-21｜消耗¥25｜GMV¥1,278｜ROI51.68">
+            <div class="trend-value">25</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D0</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-22｜消耗¥97｜GMV¥3,195｜ROI33.03">
+            <div class="trend-value">97</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D1</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-23｜消耗¥1,682｜GMV¥47,257｜ROI28.09">
+            <div class="trend-value">1,682</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:78.30902378502694%"></div>
+            </div>
+            <div class="trend-label">D2</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-24｜消耗¥2,148｜GMV¥36,943｜ROI17.20">
+            <div class="trend-value">2,148</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:100%"></div>
+            </div>
+            <div class="trend-label">D3</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-25｜消耗¥1,779｜GMV¥29,515｜ROI16.59">
+            <div class="trend-value">1,779</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:82.82627014092245%"></div>
+            </div>
+            <div class="trend-label">D4</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-26｜消耗¥689｜GMV¥12,623｜ROI18.32">
+            <div class="trend-value">689</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:32.07137835837225%"></div>
+            </div>
+            <div class="trend-label">D5</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-27｜消耗¥620｜GMV¥12,743｜ROI20.57">
+            <div class="trend-value">620</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:28.845106355243743%"></div>
+            </div>
+            <div class="trend-label">D6</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-28｜消耗¥614｜GMV¥9,672｜ROI15.76">
+            <div class="trend-value">614</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:28.579741991350055%"></div>
+            </div>
+            <div class="trend-label">D7</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-29｜消耗¥555｜GMV¥10,783｜ROI19.44">
+            <div class="trend-value">555</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:25.817159297762093%"></div>
+            </div>
+            <div class="trend-label">D8</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-30｜消耗¥150｜GMV¥4,765｜ROI31.86">
+            <div class="trend-value">150</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D9</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-31｜消耗¥652｜GMV¥13,058｜ROI20.04">
+            <div class="trend-value">652</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:30.341854477907255%"></div>
+            </div>
+            <div class="trend-label">D10</div>
+          </div>
+        
+          <div class="trend-day" title="2026-06-01｜消耗¥405｜GMV¥9,209｜ROI22.75">
+            <div class="trend-value">405</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:18.842266490998565%"></div>
+            </div>
+            <div class="trend-label">D11</div>
+          </div>
+        
+          <div class="trend-day" title="2026-06-02｜消耗¥908｜GMV¥23,712｜ROI26.12">
+            <div class="trend-value">908</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:42.270215410686276%"></div>
+            </div>
+            <div class="trend-label">D12</div>
+          </div>
+        
+          <div class="trend-day" title="2026-06-03｜消耗¥1,129｜GMV¥22,850｜ROI20.24">
+            <div class="trend-value">1,129</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:52.54493736004358%"></div>
+            </div>
+            <div class="trend-label">D13</div>
+          </div>
+        
+          <div class="trend-day" title="2026-06-04｜消耗¥520｜GMV¥13,691｜ROI26.32">
+            <div class="trend-value">520</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:24.217524290150333%"></div>
+            </div>
+            <div class="trend-label">D14</div>
+          </div>
+        
+      </div>
+    </div>
+  
+          <div class="tags"><span class="tag">放量周期：D2-D8</span><span class="tag">峰值贡献：17.9%</span><span class="tag">前4天贡献：33.0%</span><span class="tag">长尾贡献：67.0%</span><span class="tag">生命周期：15天</span></div>
+          <div class="conclusion">
+            <b>【二次放量型素材】</b>
+            <span>D0启动 → D3峰值 → D9衰退 → D6二次放量；D3达到峰值，峰值贡献17.9%；前4天贡献33.0%，后续长尾贡献67.0%；生命周期15天，具备持续获量能力，建议纳入复刻素材库。</span>
+          </div>
+        </article>
+      
+        <article class="material" id="m-4">
+          <div class="material-top">
+            <div class="rank">4</div>
+            <div class="mtitle">
+              <h3>压力可以放一放，快乐不能缺席 #遮肉显瘦穿搭 #夏季搭配 #开春搭配 #时髦精 #衬衣穿搭</h3>
+              <div class="meta">
+                <span>发布时间：2026-04-03 22:00:00</span>
+                <span>类目：针织短袖</span>
+                <span>视频关联款式：D18628142 D18628693 D18628745 D18628429</span>
+                <span>投放天数：27天</span>
+              </div>
+            </div>
+            <div class="monthly">
+              <div class="metric"><small>5月消耗</small><strong>¥4,144</strong></div>
+              <div class="metric"><small>5月GMV</small><strong>¥92,878</strong></div>
+              <div class="metric"><small>5月ROI</small><strong>22.41</strong></div>
+              <div class="metric"><small>5月进房</small><strong>13,595</strong></div>
+            </div>
+          </div>
+          <div class="stages">
+            
+    <div class="stage d0">
+      <div class="stage-head">
+        <span>冷启动</span>
+        <b>D1-D9</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 1.8%｜成交占比 2.1%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥614</strong></div>
+        <div><small>GMV</small><strong>¥15,394</strong></div>
+        <div><small>ROI</small><strong>25.08</strong></div>
+        <div><small>进房</small><strong>2,146</strong></div>
+        <div><small>CTR</small><strong>4.96%</strong></div>
+        <div><small>CVR</small><strong>4.33%</strong></div>
+      </div>
+    </div>
+  
+            
+    <div class="stage d3">
+      <div class="stage-head">
+        <span>放量</span>
+        <b>D10-D14</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 16.2%｜成交占比 21.2%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥3,554</strong></div>
+        <div><small>GMV</small><strong>¥68,870</strong></div>
+        <div><small>ROI</small><strong>19.38</strong></div>
+        <div><small>进房</small><strong>7,882</strong></div>
+        <div><small>CTR</small><strong>5.84%</strong></div>
+        <div><small>CVR</small><strong>5.15%</strong></div>
+      </div>
+    </div>
+  
+            
+    <div class="stage d7">
+      <div class="stage-head">
+        <span>衰退</span>
+        <b>-</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 -｜成交占比 -</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥0</strong></div>
+        <div><small>GMV</small><strong>¥0</strong></div>
+        <div><small>ROI</small><strong>-</strong></div>
+        <div><small>进房</small><strong>0</strong></div>
+        <div><small>CTR</small><strong>-</strong></div>
+        <div><small>CVR</small><strong>-</strong></div>
+      </div>
+    </div>
+  
+          </div>
+          
+    <div class="trend-block">
+      <div class="trend-head">
+        <div>
+          <b>发布后15天消耗趋势</b>
+          <span>用连续曲线看素材首发、放量和衰退节奏</span>
+        </div>
+        <div class="trend-summary">
+          <span>15天消耗 ¥4,168</span>
+          <span>峰值 D12 ¥1,555</span>
+          <span>峰值贡献 37.3%</span>
+          <span>前4天贡献 0.2%</span>
+          <span>有消耗 14天</span>
+        </div>
+      </div>
+      <div class="trend-bars">
+        
+          <div class="trend-day" title="2026-04-03｜消耗¥0｜GMV¥0｜ROI-">
+            <div class="trend-value"></div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:0%"></div>
+            </div>
+            <div class="trend-label">D0</div>
+          </div>
+        
+          <div class="trend-day" title="2026-04-04｜消耗¥4｜GMV¥328｜ROI74.55">
+            <div class="trend-value">4</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D1</div>
+          </div>
+        
+          <div class="trend-day" title="2026-04-05｜消耗¥3｜GMV¥672｜ROI200.00">
+            <div class="trend-value">3</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D2</div>
+          </div>
+        
+          <div class="trend-day" title="2026-04-06｜消耗¥2｜GMV¥673｜ROI384.57">
+            <div class="trend-value">2</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D3</div>
+          </div>
+        
+          <div class="trend-day" title="2026-04-07｜消耗¥2｜GMV¥641｜ROI374.85">
+            <div class="trend-value">2</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D4</div>
+          </div>
+        
+          <div class="trend-day" title="2026-04-08｜消耗¥2｜GMV¥812｜ROI412.18">
+            <div class="trend-value">2</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D5</div>
+          </div>
+        
+          <div class="trend-day" title="2026-04-09｜消耗¥105｜GMV¥3,886｜ROI37.03">
+            <div class="trend-value">105</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D6</div>
+          </div>
+        
+          <div class="trend-day" title="2026-04-10｜消耗¥178｜GMV¥3,401｜ROI19.08">
+            <div class="trend-value">178</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:11.464255395775988%"></div>
+            </div>
+            <div class="trend-label">D7</div>
+          </div>
+        
+          <div class="trend-day" title="2026-04-11｜消耗¥83｜GMV¥2,081｜ROI25.21">
+            <div class="trend-value">83</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D8</div>
+          </div>
+        
+          <div class="trend-day" title="2026-04-12｜消耗¥235｜GMV¥2,900｜ROI12.35">
+            <div class="trend-value">235</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:15.104314048311169%"></div>
+            </div>
+            <div class="trend-label">D9</div>
+          </div>
+        
+          <div class="trend-day" title="2026-04-13｜消耗¥425｜GMV¥7,278｜ROI17.14">
+            <div class="trend-value">425</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:27.31072981246624%"></div>
+            </div>
+            <div class="trend-label">D10</div>
+          </div>
+        
+          <div class="trend-day" title="2026-04-14｜消耗¥376｜GMV¥8,738｜ROI23.26">
+            <div class="trend-value">376</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:24.15686980680678%"></div>
+            </div>
+            <div class="trend-label">D11</div>
+          </div>
+        
+          <div class="trend-day" title="2026-04-15｜消耗¥1,555｜GMV¥36,270｜ROI23.33">
+            <div class="trend-value">1,555</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:100%"></div>
+            </div>
+            <div class="trend-label">D12</div>
+          </div>
+        
+          <div class="trend-day" title="2026-04-16｜消耗¥503｜GMV¥9,220｜ROI18.33">
+            <div class="trend-value">503</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:32.345715535204384%"></div>
+            </div>
+            <div class="trend-label">D13</div>
+          </div>
+        
+          <div class="trend-day" title="2026-04-17｜消耗¥696｜GMV¥7,363｜ROI10.58">
+            <div class="trend-value">696</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:44.75535718879428%"></div>
+            </div>
+            <div class="trend-label">D14</div>
+          </div>
+        
+      </div>
+    </div>
+  
+          <div class="tags"><span class="tag">放量周期：D10-D14</span><span class="tag">峰值贡献：37.3%</span><span class="tag">前4天贡献：0.2%</span><span class="tag">长尾贡献：99.8%</span><span class="tag">生命周期：14天</span></div>
+          <div class="conclusion">
+            <b>【长尾型优质素材】</b>
+            <span>D1启动 → D12峰值；D12达到峰值，峰值贡献37.3%；前4天贡献0.2%，后续长尾贡献99.8%；生命周期14天，具备持续获量能力，建议纳入复刻素材库。</span>
+          </div>
+        </article>
+      
+        <article class="material" id="m-5">
+          <div class="material-top">
+            <div class="rank">5</div>
+            <div class="mtitle">
+              <h3>颜色很克制，线条很干净#夏季新款 #谁穿谁好看#遮肉显瘦 #通勤穿搭</h3>
+              <div class="meta">
+                <span>发布时间：2026-05-05 09:41:41</span>
+                <span>类目：针织衫</span>
+                <span>视频关联款式：D18628603、D18628693</span>
+                <span>投放天数：17天</span>
+              </div>
+            </div>
+            <div class="monthly">
+              <div class="metric"><small>5月消耗</small><strong>¥4,294</strong></div>
+              <div class="metric"><small>5月GMV</small><strong>¥86,232</strong></div>
+              <div class="metric"><small>5月ROI</small><strong>20.08</strong></div>
+              <div class="metric"><small>5月进房</small><strong>8,514</strong></div>
+            </div>
+          </div>
+          <div class="stages">
+            
+    <div class="stage d0">
+      <div class="stage-head">
+        <span>冷启动</span>
+        <b>D0-D5</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 13.1%｜成交占比 14.1%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥1,385</strong></div>
+        <div><small>GMV</small><strong>¥27,615</strong></div>
+        <div><small>ROI</small><strong>19.93</strong></div>
+        <div><small>进房</small><strong>3,062</strong></div>
+        <div><small>CTR</small><strong>3.69%</strong></div>
+        <div><small>CVR</small><strong>5.62%</strong></div>
+      </div>
+    </div>
+  
+            
+    <div class="stage d3">
+      <div class="stage-head">
+        <span>放量</span>
+        <b>D6-D7</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 25.8%｜成交占比 29.0%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥1,644</strong></div>
+        <div><small>GMV</small><strong>¥39,767</strong></div>
+        <div><small>ROI</small><strong>24.18</strong></div>
+        <div><small>进房</small><strong>3,368</strong></div>
+        <div><small>CTR</small><strong>3.49%</strong></div>
+        <div><small>CVR</small><strong>7.33%</strong></div>
+      </div>
+    </div>
+  
+            
+    <div class="stage d7">
+      <div class="stage-head">
+        <span>衰退</span>
+        <b>D8-D14</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 4.6%｜成交占比 3.6%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥992</strong></div>
+        <div><small>GMV</small><strong>¥14,870</strong></div>
+        <div><small>ROI</small><strong>14.98</strong></div>
+        <div><small>进房</small><strong>1,700</strong></div>
+        <div><small>CTR</small><strong>5.07%</strong></div>
+        <div><small>CVR</small><strong>5.47%</strong></div>
+      </div>
+    </div>
+  
+          </div>
+          
+    <div class="trend-block">
+      <div class="trend-head">
+        <div>
+          <b>发布后15天消耗趋势</b>
+          <span>用连续曲线看素材首发、放量和衰退节奏</span>
+        </div>
+        <div class="trend-summary">
+          <span>15天消耗 ¥4,022</span>
+          <span>峰值 D6 ¥1,231</span>
+          <span>峰值贡献 30.6%</span>
+          <span>前4天贡献 31.9%</span>
+          <span>有消耗 15天</span>
+        </div>
+      </div>
+      <div class="trend-bars">
+        
+          <div class="trend-day" title="2026-05-05｜消耗¥926｜GMV¥19,104｜ROI20.64">
+            <div class="trend-value">926</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:75.18784166876509%"></div>
+            </div>
+            <div class="trend-label">D0</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-06｜消耗¥254｜GMV¥5,337｜ROI20.99">
+            <div class="trend-value">254</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:20.654054537036288%"></div>
+            </div>
+            <div class="trend-label">D1</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-07｜消耗¥96｜GMV¥1,093｜ROI11.39">
+            <div class="trend-value">96</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D2</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-08｜消耗¥9｜GMV¥474｜ROI55.50">
+            <div class="trend-value">9</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D3</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-09｜消耗¥60｜GMV¥646｜ROI10.77">
+            <div class="trend-value">60</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D4</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-10｜消耗¥41｜GMV¥961｜ROI23.47">
+            <div class="trend-value">41</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D5</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-11｜消耗¥1,231｜GMV¥31,593｜ROI25.66">
+            <div class="trend-value">1,231</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:100%"></div>
+            </div>
+            <div class="trend-label">D6</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-12｜消耗¥413｜GMV¥8,174｜ROI19.78">
+            <div class="trend-value">413</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:33.57106304169476%"></div>
+            </div>
+            <div class="trend-label">D7</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-13｜消耗¥218｜GMV¥2,704｜ROI12.42">
+            <div class="trend-value">218</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:17.68270394528426%"></div>
+            </div>
+            <div class="trend-label">D8</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-14｜消耗¥88｜GMV¥1,234｜ROI13.98">
+            <div class="trend-value">88</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D9</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-15｜消耗¥209｜GMV¥4,073｜ROI19.52">
+            <div class="trend-value">209</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:16.948395324468564%"></div>
+            </div>
+            <div class="trend-label">D10</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-16｜消耗¥188｜GMV¥3,798｜ROI20.18">
+            <div class="trend-value">188</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:15.288078044659612%"></div>
+            </div>
+            <div class="trend-label">D11</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-17｜消耗¥83｜GMV¥315｜ROI3.81">
+            <div class="trend-value">83</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D12</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-18｜消耗¥97｜GMV¥1,468｜ROI15.15">
+            <div class="trend-value">97</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D13</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-19｜消耗¥110｜GMV¥1,279｜ROI11.64">
+            <div class="trend-value">110</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8.9286729646086%"></div>
+            </div>
+            <div class="trend-label">D14</div>
+          </div>
+        
+      </div>
+    </div>
+  
+          <div class="tags"><span class="tag">放量周期：D6-D7</span><span class="tag">峰值贡献：30.6%</span><span class="tag">前4天贡献：31.9%</span><span class="tag">长尾贡献：68.1%</span><span class="tag">生命周期：15天</span></div>
+          <div class="conclusion">
+            <b>【长尾型优质素材】</b>
+            <span>D0启动 → D6峰值 → D8衰退；D6达到峰值，峰值贡献30.6%；前4天贡献31.9%，后续长尾贡献68.1%；生命周期15天，具备持续获量能力，建议纳入复刻素材库。</span>
+          </div>
+        </article>
+      
+        <article class="material" id="m-6">
+          <div class="material-top">
+            <div class="rank">6</div>
+            <div class="mtitle">
+              <h3>穿的舒服了，人就松弛了#夏季新款 #谁穿谁好看 #通勤穿搭简约日常 #面料柔软舒适</h3>
+              <div class="meta">
+                <span>发布时间：2026-05-18 21:37:31</span>
+                <span>类目：针织衫</span>
+                <span>视频关联款式：D18628745、D18628693</span>
+                <span>投放天数：14天</span>
+              </div>
+            </div>
+            <div class="monthly">
+              <div class="metric"><small>5月消耗</small><strong>¥3,157</strong></div>
+              <div class="metric"><small>5月GMV</small><strong>¥64,504</strong></div>
+              <div class="metric"><small>5月ROI</small><strong>20.43</strong></div>
+              <div class="metric"><small>5月进房</small><strong>7,356</strong></div>
+            </div>
+          </div>
+          <div class="stages">
+            
+    <div class="stage d0">
+      <div class="stage-head">
+        <span>冷启动</span>
+        <b>D0</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 1.6%｜成交占比 1.9%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥40</strong></div>
+        <div><small>GMV</small><strong>¥950</strong></div>
+        <div><small>ROI</small><strong>23.56</strong></div>
+        <div><small>进房</small><strong>86</strong></div>
+        <div><small>CTR</small><strong>6.04%</strong></div>
+        <div><small>CVR</small><strong>6.98%</strong></div>
+      </div>
+    </div>
+  
+            
+    <div class="stage d3">
+      <div class="stage-head">
+        <span>放量</span>
+        <b>D1-D3</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 15.9%｜成交占比 14.3%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥2,310</strong></div>
+        <div><small>GMV</small><strong>¥45,152</strong></div>
+        <div><small>ROI</small><strong>19.54</strong></div>
+        <div><small>进房</small><strong>4,891</strong></div>
+        <div><small>CTR</small><strong>3.76%</strong></div>
+        <div><small>CVR</small><strong>5.79%</strong></div>
+      </div>
+    </div>
+  
+            
+    <div class="stage d7">
+      <div class="stage-head">
+        <span>衰退</span>
+        <b>D4-D14</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 1.5%｜成交占比 1.4%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥819</strong></div>
+        <div><small>GMV</small><strong>¥18,402</strong></div>
+        <div><small>ROI</small><strong>22.48</strong></div>
+        <div><small>进房</small><strong>2,420</strong></div>
+        <div><small>CTR</small><strong>5.25%</strong></div>
+        <div><small>CVR</small><strong>4.83%</strong></div>
+      </div>
+    </div>
+  
+          </div>
+          
+    <div class="trend-block">
+      <div class="trend-head">
+        <div>
+          <b>发布后15天消耗趋势</b>
+          <span>用连续曲线看素材首发、放量和衰退节奏</span>
+        </div>
+        <div class="trend-summary">
+          <span>15天消耗 ¥3,169</span>
+          <span>峰值 D2 ¥1,427</span>
+          <span>峰值贡献 45.0%</span>
+          <span>前4天贡献 74.2%</span>
+          <span>有消耗 15天</span>
+        </div>
+      </div>
+      <div class="trend-bars">
+        
+          <div class="trend-day" title="2026-05-18｜消耗¥40｜GMV¥950｜ROI23.56">
+            <div class="trend-value">40</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D0</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-19｜消耗¥327｜GMV¥9,854｜ROI30.17">
+            <div class="trend-value">327</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:22.885495434253958%"></div>
+            </div>
+            <div class="trend-label">D1</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-20｜消耗¥1,427｜GMV¥24,691｜ROI17.30">
+            <div class="trend-value">1,427</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:100%"></div>
+            </div>
+            <div class="trend-label">D2</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-21｜消耗¥557｜GMV¥10,608｜ROI19.05">
+            <div class="trend-value">557</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:39.02223654979572%"></div>
+            </div>
+            <div class="trend-label">D3</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-22｜消耗¥212｜GMV¥3,748｜ROI17.70">
+            <div class="trend-value">212</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:14.836747422788784%"></div>
+            </div>
+            <div class="trend-label">D4</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-23｜消耗¥108｜GMV¥1,469｜ROI13.66">
+            <div class="trend-value">108</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D5</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-24｜消耗¥92｜GMV¥2,126｜ROI23.15">
+            <div class="trend-value">92</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D6</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-25｜消耗¥45｜GMV¥1,903｜ROI42.75">
+            <div class="trend-value">45</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D7</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-26｜消耗¥112｜GMV¥2,536｜ROI22.59">
+            <div class="trend-value">112</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D8</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-27｜消耗¥104｜GMV¥3,443｜ROI33.10">
+            <div class="trend-value">104</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D9</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-28｜消耗¥30｜GMV¥801｜ROI26.74">
+            <div class="trend-value">30</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D10</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-29｜消耗¥75｜GMV¥2,058｜ROI27.28">
+            <div class="trend-value">75</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D11</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-30｜消耗¥16｜GMV¥159｜ROI10.01">
+            <div class="trend-value">16</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D12</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-31｜消耗¥13｜GMV¥159｜ROI12.11">
+            <div class="trend-value">13</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D13</div>
+          </div>
+        
+          <div class="trend-day" title="2026-06-01｜消耗¥12｜GMV¥0｜ROI0.00">
+            <div class="trend-value">12</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D14</div>
+          </div>
+        
+      </div>
+    </div>
+  
+          <div class="tags"><span class="tag">放量周期：D1-D3</span><span class="tag">峰值贡献：45.0%</span><span class="tag">前4天贡献：74.2%</span><span class="tag">长尾贡献：25.8%</span><span class="tag">生命周期：15天</span></div>
+          <div class="conclusion">
+            <b>【单日爆发型素材】</b>
+            <span>D0启动 → D2峰值 → D4衰退；D2达到峰值，峰值贡献45.0%；前4天贡献74.2%，后续长尾贡献25.8%；生命周期15天，具备持续获量能力，建议纳入复刻素材库。</span>
+          </div>
+        </article>
+      
+        <article class="material" id="m-7">
+          <div class="material-top">
+            <div class="rank">7</div>
+            <div class="mtitle">
+              <h3>没有弯弯绕绕，预热也给大家直降不啰嗦 #名媛风  #少女感 #小心机 #夏日穿搭</h3>
+              <div class="meta">
+                <span>发布时间：2026-05-15 19:00:00</span>
+                <span>类目：合集</span>
+                <span>视频关联款式：D18628603、D18628693、D18628142、D18628030、D18628429、F18627612、F18528119H1</span>
+                <span>投放天数：17天</span>
+              </div>
+            </div>
+            <div class="monthly">
+              <div class="metric"><small>5月消耗</small><strong>¥2,807</strong></div>
+              <div class="metric"><small>5月GMV</small><strong>¥63,712</strong></div>
+              <div class="metric"><small>5月ROI</small><strong>22.70</strong></div>
+              <div class="metric"><small>5月进房</small><strong>15,598</strong></div>
+            </div>
+          </div>
+          <div class="stages">
+            
+    <div class="stage d0">
+      <div class="stage-head">
+        <span>冷启动</span>
+        <b>D0</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 0.2%｜成交占比 0.6%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥6</strong></div>
+        <div><small>GMV</small><strong>¥320</strong></div>
+        <div><small>ROI</small><strong>58.18</strong></div>
+        <div><small>进房</small><strong>124</strong></div>
+        <div><small>CTR</small><strong>11.38%</strong></div>
+        <div><small>CVR</small><strong>1.61%</strong></div>
+      </div>
+    </div>
+  
+            
+    <div class="stage d3">
+      <div class="stage-head">
+        <span>放量</span>
+        <b>D1-D9</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 3.9%｜成交占比 4.1%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥1,836</strong></div>
+        <div><small>GMV</small><strong>¥43,329</strong></div>
+        <div><small>ROI</small><strong>23.59</strong></div>
+        <div><small>进房</small><strong>11,056</strong></div>
+        <div><small>CTR</small><strong>10.19%</strong></div>
+        <div><small>CVR</small><strong>2.45%</strong></div>
+      </div>
+    </div>
+  
+            
+    <div class="stage d7">
+      <div class="stage-head">
+        <span>衰退</span>
+        <b>-</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 -｜成交占比 -</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥0</strong></div>
+        <div><small>GMV</small><strong>¥0</strong></div>
+        <div><small>ROI</small><strong>-</strong></div>
+        <div><small>进房</small><strong>0</strong></div>
+        <div><small>CTR</small><strong>-</strong></div>
+        <div><small>CVR</small><strong>-</strong></div>
+      </div>
+    </div>
+  
+          </div>
+          
+    <div class="trend-block">
+      <div class="trend-head">
+        <div>
+          <b>发布后15天消耗趋势</b>
+          <span>用连续曲线看素材首发、放量和衰退节奏</span>
+        </div>
+        <div class="trend-summary">
+          <span>15天消耗 ¥1,977</span>
+          <span>峰值 D5 ¥379</span>
+          <span>峰值贡献 19.2%</span>
+          <span>前4天贡献 36.2%</span>
+          <span>有消耗 15天</span>
+        </div>
+      </div>
+      <div class="trend-bars">
+        
+          <div class="trend-day" title="2026-05-15｜消耗¥6｜GMV¥320｜ROI58.18">
+            <div class="trend-value">6</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D0</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-16｜消耗¥332｜GMV¥8,047｜ROI24.22">
+            <div class="trend-value">332</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:87.73305868061057%"></div>
+            </div>
+            <div class="trend-label">D1</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-17｜消耗¥215｜GMV¥4,836｜ROI22.45">
+            <div class="trend-value">215</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:56.87688163524005%"></div>
+            </div>
+            <div class="trend-label">D2</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-18｜消耗¥162｜GMV¥2,995｜ROI18.53">
+            <div class="trend-value">162</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:42.68208947340622%"></div>
+            </div>
+            <div class="trend-label">D3</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-19｜消耗¥221｜GMV¥6,218｜ROI28.14">
+            <div class="trend-value">221</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:58.34785823694079%"></div>
+            </div>
+            <div class="trend-label">D4</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-20｜消耗¥379｜GMV¥9,826｜ROI25.95">
+            <div class="trend-value">379</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:100%"></div>
+            </div>
+            <div class="trend-label">D5</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-21｜消耗¥186｜GMV¥4,518｜ROI24.23">
+            <div class="trend-value">186</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:49.24734590397718%"></div>
+            </div>
+            <div class="trend-label">D6</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-22｜消耗¥137｜GMV¥2,039｜ROI14.85">
+            <div class="trend-value">137</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:36.270004753604816%"></div>
+            </div>
+            <div class="trend-label">D7</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-23｜消耗¥110｜GMV¥2,238｜ROI20.27">
+            <div class="trend-value">110</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:29.160724660645432%"></div>
+            </div>
+            <div class="trend-label">D8</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-24｜消耗¥93｜GMV¥2,612｜ROI27.99">
+            <div class="trend-value">93</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:24.652722759203506%"></div>
+            </div>
+            <div class="trend-label">D9</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-25｜消耗¥13｜GMV¥831｜ROI62.48">
+            <div class="trend-value">13</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D10</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-26｜消耗¥53｜GMV¥1,283｜ROI24.09">
+            <div class="trend-value">53</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:14.060106692019225%"></div>
+            </div>
+            <div class="trend-label">D11</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-27｜消耗¥28｜GMV¥1,021｜ROI36.32">
+            <div class="trend-value">28</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D12</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-28｜消耗¥18｜GMV¥945｜ROI53.83">
+            <div class="trend-value">18</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D13</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-29｜消耗¥23｜GMV¥328｜ROI14.51">
+            <div class="trend-value">23</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D14</div>
+          </div>
+        
+      </div>
+    </div>
+  
+          <div class="tags"><span class="tag">放量周期：D1-D9</span><span class="tag">峰值贡献：19.2%</span><span class="tag">前4天贡献：36.2%</span><span class="tag">长尾贡献：63.8%</span><span class="tag">生命周期：15天</span></div>
+          <div class="conclusion">
+            <b>【二次放量型素材】</b>
+            <span>D0启动 → D5峰值 → D10衰退 → D8二次放量；D5达到峰值，峰值贡献19.2%；前4天贡献36.2%，后续长尾贡献63.8%；生命周期15天，具备持续获量能力，建议纳入复刻素材库。</span>
+          </div>
+        </article>
+      
+        <article class="material" id="m-8">
+          <div class="material-top">
+            <div class="rank">8</div>
+            <div class="mtitle">
+              <h3>夏天怕热怕闷的姐妹看过来！ #上班穿搭 #春夏搭配 #法式穿搭 #面料柔软舒适 #谁穿谁好看</h3>
+              <div class="meta">
+                <span>发布时间：2026-05-13 12:08:44</span>
+                <span>类目：针织衫</span>
+                <span>视频关联款式：D18628142、D18628693</span>
+                <span>投放天数：19天</span>
+              </div>
+            </div>
+            <div class="monthly">
+              <div class="metric"><small>5月消耗</small><strong>¥2,391</strong></div>
+              <div class="metric"><small>5月GMV</small><strong>¥63,090</strong></div>
+              <div class="metric"><small>5月ROI</small><strong>26.38</strong></div>
+              <div class="metric"><small>5月进房</small><strong>5,895</strong></div>
+            </div>
+          </div>
+          <div class="stages">
+            
+    <div class="stage d0">
+      <div class="stage-head">
+        <span>冷启动</span>
+        <b>D0-D7</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 0.4%｜成交占比 1.1%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥112</strong></div>
+        <div><small>GMV</small><strong>¥5,461</strong></div>
+        <div><small>ROI</small><strong>48.68</strong></div>
+        <div><small>进房</small><strong>580</strong></div>
+        <div><small>CTR</small><strong>3.69%</strong></div>
+        <div><small>CVR</small><strong>5.69%</strong></div>
+      </div>
+    </div>
+  
+            
+    <div class="stage d3">
+      <div class="stage-head">
+        <span>放量</span>
+        <b>D8-D11</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 2.7%｜成交占比 3.2%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥789</strong></div>
+        <div><small>GMV</small><strong>¥22,445</strong></div>
+        <div><small>ROI</small><strong>28.43</strong></div>
+        <div><small>进房</small><strong>1,947</strong></div>
+        <div><small>CTR</small><strong>6.37%</strong></div>
+        <div><small>CVR</small><strong>7.24%</strong></div>
+      </div>
+    </div>
+  
+            
+    <div class="stage d7">
+      <div class="stage-head">
+        <span>衰退</span>
+        <b>D12</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 0.6%｜成交占比 2.1%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥37</strong></div>
+        <div><small>GMV</small><strong>¥3,187</strong></div>
+        <div><small>ROI</small><strong>85.67</strong></div>
+        <div><small>进房</small><strong>159</strong></div>
+        <div><small>CTR</small><strong>5.45%</strong></div>
+        <div><small>CVR</small><strong>11.95%</strong></div>
+      </div>
+    </div>
+  
+          </div>
+          
+    <div class="trend-block">
+      <div class="trend-head">
+        <div>
+          <b>发布后15天消耗趋势</b>
+          <span>用连续曲线看素材首发、放量和衰退节奏</span>
+        </div>
+        <div class="trend-summary">
+          <span>15天消耗 ¥1,365</span>
+          <span>峰值 D10 ¥373</span>
+          <span>峰值贡献 27.3%</span>
+          <span>前4天贡献 2.4%</span>
+          <span>有消耗 15天</span>
+        </div>
+      </div>
+      <div class="trend-bars">
+        
+          <div class="trend-day" title="2026-05-13｜消耗¥4｜GMV¥0｜ROI0.00">
+            <div class="trend-value">4</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D0</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-14｜消耗¥19｜GMV¥984｜ROI51.52">
+            <div class="trend-value">19</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D1</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-15｜消耗¥7｜GMV¥0｜ROI0.00">
+            <div class="trend-value">7</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D2</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-16｜消耗¥3｜GMV¥165｜ROI52.72">
+            <div class="trend-value">3</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D3</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-17｜消耗¥2｜GMV¥165｜ROI80.88">
+            <div class="trend-value">2</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D4</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-18｜消耗¥66｜GMV¥2,998｜ROI45.77">
+            <div class="trend-value">66</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:17.580588882626085%"></div>
+            </div>
+            <div class="trend-label">D5</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-19｜消耗¥3｜GMV¥324｜ROI121.35">
+            <div class="trend-value">3</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D6</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-20｜消耗¥9｜GMV¥825｜ROI86.93">
+            <div class="trend-value">9</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D7</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-21｜消耗¥145｜GMV¥4,911｜ROI33.93">
+            <div class="trend-value">145</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:38.846391282175155%"></div>
+            </div>
+            <div class="trend-label">D8</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-22｜消耗¥164｜GMV¥3,538｜ROI21.64">
+            <div class="trend-value">164</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:43.88437072228038%"></div>
+            </div>
+            <div class="trend-label">D9</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-23｜消耗¥373｜GMV¥11,287｜ROI30.29">
+            <div class="trend-value">373</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:100%"></div>
+            </div>
+            <div class="trend-label">D10</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-24｜消耗¥109｜GMV¥2,709｜ROI24.95">
+            <div class="trend-value">109</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:29.146200713959797%"></div>
+            </div>
+            <div class="trend-label">D11</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-25｜消耗¥37｜GMV¥3,187｜ROI85.67">
+            <div class="trend-value">37</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:9.98470086158306%"></div>
+            </div>
+            <div class="trend-label">D12</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-26｜消耗¥117｜GMV¥3,207｜ROI27.38">
+            <div class="trend-value">117</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:31.43570335775828%"></div>
+            </div>
+            <div class="trend-label">D13</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-27｜消耗¥310｜GMV¥8,353｜ROI26.98">
+            <div class="trend-value">310</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:83.09311001959362%"></div>
+            </div>
+            <div class="trend-label">D14</div>
+          </div>
+        
+      </div>
+    </div>
+  
+          <div class="tags"><span class="tag">放量周期：D8-D11</span><span class="tag">峰值贡献：27.3%</span><span class="tag">前4天贡献：2.4%</span><span class="tag">长尾贡献：97.6%</span><span class="tag">生命周期：15天</span></div>
+          <div class="conclusion">
+            <b>【二次放量型素材】</b>
+            <span>D0启动 → D10峰值 → D12衰退 → D13二次放量；D10达到峰值，峰值贡献27.3%；前4天贡献2.4%，后续长尾贡献97.6%；生命周期15天，具备持续获量能力，建议纳入复刻素材库。</span>
+          </div>
+        </article>
+      
+        <article class="material" id="m-9">
+          <div class="material-top">
+            <div class="rank">9</div>
+            <div class="mtitle">
+              <h3>风一吹，上身是凉快的舒服的#夏季新款 #面料舒适透气 #遮肉显瘦 #谁穿谁好看</h3>
+              <div class="meta">
+                <span>发布时间：2026-05-25 22:40:05</span>
+                <span>类目：针织衫</span>
+                <span>视频关联款式：D18628693</span>
+                <span>投放天数：6天</span>
+              </div>
+            </div>
+            <div class="monthly">
+              <div class="metric"><small>5月消耗</small><strong>¥1,713</strong></div>
+              <div class="metric"><small>5月GMV</small><strong>¥39,923</strong></div>
+              <div class="metric"><small>5月ROI</small><strong>23.31</strong></div>
+              <div class="metric"><small>5月进房</small><strong>4,529</strong></div>
+            </div>
+          </div>
+          <div class="stages">
+            
+    <div class="stage d0">
+      <div class="stage-head">
+        <span>冷启动</span>
+        <b>D1-D2</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 1.1%｜成交占比 2.1%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥79</strong></div>
+        <div><small>GMV</small><strong>¥4,255</strong></div>
+        <div><small>ROI</small><strong>54.00</strong></div>
+        <div><small>进房</small><strong>645</strong></div>
+        <div><small>CTR</small><strong>4.17%</strong></div>
+        <div><small>CVR</small><strong>4.19%</strong></div>
+      </div>
+    </div>
+  
+            
+    <div class="stage d3">
+      <div class="stage-head">
+        <span>放量</span>
+        <b>D3-D5</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 11.9%｜成交占比 11.9%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥1,487</strong></div>
+        <div><small>GMV</small><strong>¥33,128</strong></div>
+        <div><small>ROI</small><strong>22.28</strong></div>
+        <div><small>进房</small><strong>3,421</strong></div>
+        <div><small>CTR</small><strong>5.09%</strong></div>
+        <div><small>CVR</small><strong>6.08%</strong></div>
+      </div>
+    </div>
+  
+            
+    <div class="stage d7">
+      <div class="stage-head">
+        <span>衰退</span>
+        <b>D6</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 3.7%｜成交占比 2.7%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥147</strong></div>
+        <div><small>GMV</small><strong>¥2,540</strong></div>
+        <div><small>ROI</small><strong>17.31</strong></div>
+        <div><small>进房</small><strong>463</strong></div>
+        <div><small>CTR</small><strong>5.79%</strong></div>
+        <div><small>CVR</small><strong>3.46%</strong></div>
+      </div>
+    </div>
+  
+          </div>
+          
+    <div class="trend-block">
+      <div class="trend-head">
+        <div>
+          <b>发布后15天消耗趋势</b>
+          <span>用连续曲线看素材首发、放量和衰退节奏</span>
+        </div>
+        <div class="trend-summary">
+          <span>15天消耗 ¥3,629</span>
+          <span>峰值 D4 ¥890</span>
+          <span>峰值贡献 24.5%</span>
+          <span>前4天贡献 12.8%</span>
+          <span>有消耗 14天</span>
+        </div>
+      </div>
+      <div class="trend-bars">
+        
+          <div class="trend-day" title="2026-05-25｜消耗¥0｜GMV¥0｜ROI-">
+            <div class="trend-value"></div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:0%"></div>
+            </div>
+            <div class="trend-label">D0</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-26｜消耗¥19｜GMV¥1,427｜ROI76.03">
+            <div class="trend-value">19</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D1</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-27｜消耗¥60｜GMV¥2,828｜ROI47.11">
+            <div class="trend-value">60</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D2</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-28｜消耗¥385｜GMV¥9,383｜ROI24.37">
+            <div class="trend-value">385</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:43.27170553526271%"></div>
+            </div>
+            <div class="trend-label">D3</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-29｜消耗¥890｜GMV¥19,154｜ROI21.53">
+            <div class="trend-value">890</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:100%"></div>
+            </div>
+            <div class="trend-label">D4</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-30｜消耗¥212｜GMV¥4,591｜ROI21.62">
+            <div class="trend-value">212</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:23.866254565889296%"></div>
+            </div>
+            <div class="trend-label">D5</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-31｜消耗¥147｜GMV¥2,540｜ROI17.31">
+            <div class="trend-value">147</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:16.488901376791233%"></div>
+            </div>
+            <div class="trend-label">D6</div>
+          </div>
+        
+          <div class="trend-day" title="2026-06-01｜消耗¥188｜GMV¥3,840｜ROI20.46">
+            <div class="trend-value">188</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:21.09581343073897%"></div>
+            </div>
+            <div class="trend-label">D7</div>
+          </div>
+        
+          <div class="trend-day" title="2026-06-02｜消耗¥279｜GMV¥6,664｜ROI23.89">
+            <div class="trend-value">279</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:31.350379320033717%"></div>
+            </div>
+            <div class="trend-label">D8</div>
+          </div>
+        
+          <div class="trend-day" title="2026-06-03｜消耗¥579｜GMV¥9,710｜ROI16.76">
+            <div class="trend-value">579</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:65.09918516437202%"></div>
+            </div>
+            <div class="trend-label">D9</div>
+          </div>
+        
+          <div class="trend-day" title="2026-06-04｜消耗¥234｜GMV¥3,954｜ROI16.87">
+            <div class="trend-value">234</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:26.351222253441982%"></div>
+            </div>
+            <div class="trend-label">D10</div>
+          </div>
+        
+          <div class="trend-day" title="2026-06-05｜消耗¥345｜GMV¥6,986｜ROI20.26">
+            <div class="trend-value">345</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:38.76032593425119%"></div>
+            </div>
+            <div class="trend-label">D11</div>
+          </div>
+        
+          <div class="trend-day" title="2026-06-06｜消耗¥120｜GMV¥5,110｜ROI42.54">
+            <div class="trend-value">120</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:13.499297555493117%"></div>
+            </div>
+            <div class="trend-label">D12</div>
+          </div>
+        
+          <div class="trend-day" title="2026-06-07｜消耗¥115｜GMV¥2,884｜ROI24.98">
+            <div class="trend-value">115</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:12.975554931160438%"></div>
+            </div>
+            <div class="trend-label">D13</div>
+          </div>
+        
+          <div class="trend-day" title="2026-06-08｜消耗¥55｜GMV¥1,943｜ROI35.15">
+            <div class="trend-value">55</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D14</div>
+          </div>
+        
+      </div>
+    </div>
+  
+          <div class="tags"><span class="tag">放量周期：D3-D5</span><span class="tag">峰值贡献：24.5%</span><span class="tag">前4天贡献：12.8%</span><span class="tag">长尾贡献：87.2%</span><span class="tag">生命周期：14天</span></div>
+          <div class="conclusion">
+            <b>【二次放量型素材】</b>
+            <span>D1启动 → D4峰值 → D6衰退 → D7二次放量；D4达到峰值，峰值贡献24.5%；前4天贡献12.8%，后续长尾贡献87.2%；生命周期14天，具备持续获量能力，建议纳入复刻素材库。</span>
+          </div>
+        </article>
+      
+        <article class="material" id="m-10">
+          <div class="material-top">
+            <div class="rank">10</div>
+            <div class="mtitle">
+              <h3>岁月无声，用心活着，自带光芒 #日系甜美 #小个穿搭 #度假穿搭 #微胖穿搭</h3>
+              <div class="meta">
+                <span>发布时间：2026-05-15 19:30:00</span>
+                <span>类目：针织衫</span>
+                <span>视频关联款式：D18628142、D18628693</span>
+                <span>投放天数：15天</span>
+              </div>
+            </div>
+            <div class="monthly">
+              <div class="metric"><small>5月消耗</small><strong>¥1,140</strong></div>
+              <div class="metric"><small>5月GMV</small><strong>¥28,485</strong></div>
+              <div class="metric"><small>5月ROI</small><strong>24.99</strong></div>
+              <div class="metric"><small>5月进房</small><strong>3,819</strong></div>
+            </div>
+          </div>
+          <div class="stages">
+            
+    <div class="stage d0">
+      <div class="stage-head">
+        <span>冷启动</span>
+        <b>D0-D3</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 0.7%｜成交占比 1.3%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥89</strong></div>
+        <div><small>GMV</small><strong>¥3,081</strong></div>
+        <div><small>ROI</small><strong>34.43</strong></div>
+        <div><small>进房</small><strong>736</strong></div>
+        <div><small>CTR</small><strong>4.61%</strong></div>
+        <div><small>CVR</small><strong>2.85%</strong></div>
+      </div>
+    </div>
+  
+            
+    <div class="stage d3">
+      <div class="stage-head">
+        <span>放量</span>
+        <b>D4-D9</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 2.6%｜成交占比 2.6%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥963</strong></div>
+        <div><small>GMV</small><strong>¥23,015</strong></div>
+        <div><small>ROI</small><strong>23.89</strong></div>
+        <div><small>进房</small><strong>2,877</strong></div>
+        <div><small>CTR</small><strong>4.59%</strong></div>
+        <div><small>CVR</small><strong>4.97%</strong></div>
+      </div>
+    </div>
+  
+            
+    <div class="stage d7">
+      <div class="stage-head">
+        <span>衰退</span>
+        <b>D10-D13</b>
+      </div>
+      <div class="stage-live">短视频消耗占比 0.5%｜成交占比 0.5%</div>
+      <div class="stage-grid">
+        <div><small>消耗</small><strong>¥87</strong></div>
+        <div><small>GMV</small><strong>¥2,389</strong></div>
+        <div><small>ROI</small><strong>27.50</strong></div>
+        <div><small>进房</small><strong>206</strong></div>
+        <div><small>CTR</small><strong>4.59%</strong></div>
+        <div><small>CVR</small><strong>7.28%</strong></div>
+      </div>
+    </div>
+  
+          </div>
+          
+    <div class="trend-block">
+      <div class="trend-head">
+        <div>
+          <b>发布后15天消耗趋势</b>
+          <span>用连续曲线看素材首发、放量和衰退节奏</span>
+        </div>
+        <div class="trend-summary">
+          <span>15天消耗 ¥1,140</span>
+          <span>峰值 D8 ¥296</span>
+          <span>峰值贡献 26.0%</span>
+          <span>前4天贡献 7.9%</span>
+          <span>有消耗 14天</span>
+        </div>
+      </div>
+      <div class="trend-bars">
+        
+          <div class="trend-day" title="2026-05-15｜消耗¥9｜GMV¥195｜ROI20.88">
+            <div class="trend-value">9</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D0</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-16｜消耗¥16｜GMV¥1,127｜ROI72.09">
+            <div class="trend-value">16</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D1</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-17｜消耗¥12｜GMV¥592｜ROI49.79">
+            <div class="trend-value">12</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D2</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-18｜消耗¥53｜GMV¥1,167｜ROI22.18">
+            <div class="trend-value">53</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:17.78423685277815%"></div>
+            </div>
+            <div class="trend-label">D3</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-19｜消耗¥93｜GMV¥1,991｜ROI21.30">
+            <div class="trend-value">93</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:31.59388941462755%"></div>
+            </div>
+            <div class="trend-label">D4</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-20｜消耗¥124｜GMV¥2,194｜ROI17.74">
+            <div class="trend-value">124</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:41.79735027713939%"></div>
+            </div>
+            <div class="trend-label">D5</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-21｜消耗¥144｜GMV¥4,717｜ROI32.68">
+            <div class="trend-value">144</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:48.77653102609166%"></div>
+            </div>
+            <div class="trend-label">D6</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-22｜消耗¥147｜GMV¥4,820｜ROI32.82">
+            <div class="trend-value">147</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:49.63160740840881%"></div>
+            </div>
+            <div class="trend-label">D7</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-23｜消耗¥296｜GMV¥6,366｜ROI21.51">
+            <div class="trend-value">296</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:100%"></div>
+            </div>
+            <div class="trend-label">D8</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-24｜消耗¥159｜GMV¥2,927｜ROI18.41">
+            <div class="trend-value">159</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:53.74138164120589%"></div>
+            </div>
+            <div class="trend-label">D9</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-25｜消耗¥16｜GMV¥318｜ROI20.20">
+            <div class="trend-value">16</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D10</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-26｜消耗¥54｜GMV¥1,912｜ROI35.59">
+            <div class="trend-value">54</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:18.15600919291605%"></div>
+            </div>
+            <div class="trend-label">D11</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-27｜消耗¥11｜GMV¥0｜ROI0.00">
+            <div class="trend-value">11</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D12</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-28｜消耗¥7｜GMV¥159｜ROI23.70">
+            <div class="trend-value">7</div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:8%"></div>
+            </div>
+            <div class="trend-label">D13</div>
+          </div>
+        
+          <div class="trend-day" title="2026-05-29｜消耗¥0｜GMV¥0｜ROI-">
+            <div class="trend-value"></div>
+            <div class="trend-track">
+              <div class="trend-fill" style="height:0%"></div>
+            </div>
+            <div class="trend-label">D14</div>
+          </div>
+        
+      </div>
+    </div>
+  
+          <div class="tags"><span class="tag">放量周期：D4-D9</span><span class="tag">峰值贡献：26.0%</span><span class="tag">前4天贡献：7.9%</span><span class="tag">长尾贡献：92.1%</span><span class="tag">生命周期：14天</span></div>
+          <div class="conclusion">
+            <b>【长尾型优质素材】</b>
+            <span>D0启动 → D8峰值 → D10衰退；D8达到峰值，峰值贡献26.0%；前4天贡献7.9%，后续长尾贡献92.1%；生命周期14天，具备持续获量能力，建议纳入复刻素材库。</span>
+          </div>
+        </article>
+      
+
+      <div class="section-title">
+        <h2>汇总表</h2>
+        <span>可复制到Excel或飞书表格继续筛选</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>素材</th><th>发布时间</th><th>类目/货号</th>
+              <th>5月消耗</th><th>5月GMV</th><th>5月ROI</th>
+              <th>D0承接状态</th><th>D0消耗/ROI</th><th>D3承接状态</th><th>D3消耗/ROI</th><th>D7承接状态</th><th>D7消耗/ROI</th><th>判断</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>1</td>
+                <td>谁都不缺衣服，缺的是换装的好心情#夏季新款 #谁穿谁好看 #遮肉显瘦 #小个子穿搭</td>
+                <td>2026-05-20 21:20:20</td>
+                <td>针织衫 / D18628693</td>
+                <td class="num">¥12,147</td>
+                <td class="num">¥289,790</td>
+                <td class="num good">23.86</td>
+                <td>已匹配</td>
+                <td class="num">¥41 / 27.39</td>
+                <td>已匹配</td>
+                <td class="num">¥2,174 / 21.69</td>
+                <td>已匹配</td>
+                <td class="num">¥385 / 28.09</td>
+                <td>放量周期：D1-D4；峰值贡献：20.8%；前4天贡献：54.3%；长尾贡献：45.7%；生命周期：15天</td>
+              </tr>
+            
+              <tr>
+                <td>2</td>
+                <td>怕热的姐妹，一定要入这款凉感面料 #穿搭技巧 #面料舒适透气 #小个子穿搭 #通勤穿搭 #谁穿谁好看</td>
+                <td>2026-05-21 11:45:49</td>
+                <td>针织衫 / D18628693</td>
+                <td class="num">¥10,318</td>
+                <td class="num">¥280,632</td>
+                <td class="num good">27.20</td>
+                <td>已匹配</td>
+                <td class="num">¥56 / 48.05</td>
+                <td>已匹配</td>
+                <td class="num">¥2,257 / 26.68</td>
+                <td>已匹配</td>
+                <td class="num">¥997 / 22.58</td>
+                <td>放量周期：D1-D8；峰值贡献：17.0%；前4天贡献：25.8%；长尾贡献：74.2%；生命周期：15天</td>
+              </tr>
+            
+              <tr>
+                <td>3</td>
+                <td>简约大气不挑人，上班穿得体又高级 #面料舒适透气 #通勤穿搭 #遮肉显瘦 #通勤穿搭 #穿出高级感</td>
+                <td>2026-05-21 22:00:00</td>
+                <td>针织衫 / D18628693</td>
+                <td class="num">¥9,009</td>
+                <td class="num">¥181,831</td>
+                <td class="num good">20.18</td>
+                <td>已匹配</td>
+                <td class="num">¥25 / 51.68</td>
+                <td>已匹配</td>
+                <td class="num">¥2,148 / 17.20</td>
+                <td>已匹配</td>
+                <td class="num">¥614 / 15.76</td>
+                <td>放量周期：D2-D8；峰值贡献：17.9%；前4天贡献：33.0%；长尾贡献：67.0%；生命周期：15天</td>
+              </tr>
+            
+              <tr>
+                <td>4</td>
+                <td>压力可以放一放，快乐不能缺席 #遮肉显瘦穿搭 #夏季搭配 #开春搭配 #时髦精 #衬衣穿搭</td>
+                <td>2026-04-03 22:00:00</td>
+                <td>针织短袖 / D18628142 D18628693 D18628745 D18628429</td>
+                <td class="num">¥4,144</td>
+                <td class="num">¥92,878</td>
+                <td class="num good">22.41</td>
+                <td>无直播</td>
+                <td class="num">¥0 / -</td>
+                <td>主推款未填</td>
+                <td class="num">¥2 / 384.57</td>
+                <td>主推款未填</td>
+                <td class="num">¥178 / 19.08</td>
+                <td>放量周期：D10-D14；峰值贡献：37.3%；前4天贡献：0.2%；长尾贡献：99.8%；生命周期：14天</td>
+              </tr>
+            
+              <tr>
+                <td>5</td>
+                <td>颜色很克制，线条很干净#夏季新款 #谁穿谁好看#遮肉显瘦 #通勤穿搭</td>
+                <td>2026-05-05 09:41:41</td>
+                <td>针织衫 / D18628603 D18628693</td>
+                <td class="num">¥4,294</td>
+                <td class="num">¥86,232</td>
+                <td class="num good">20.08</td>
+                <td>已匹配</td>
+                <td class="num">¥926 / 20.64</td>
+                <td>未匹配</td>
+                <td class="num">¥9 / 55.50</td>
+                <td>已匹配</td>
+                <td class="num">¥413 / 19.78</td>
+                <td>放量周期：D6-D7；峰值贡献：30.6%；前4天贡献：31.9%；长尾贡献：68.1%；生命周期：15天</td>
+              </tr>
+            
+              <tr>
+                <td>6</td>
+                <td>穿的舒服了，人就松弛了#夏季新款 #谁穿谁好看 #通勤穿搭简约日常 #面料柔软舒适</td>
+                <td>2026-05-18 21:37:31</td>
+                <td>针织衫 / D18628745 D18628693</td>
+                <td class="num">¥3,157</td>
+                <td class="num">¥64,504</td>
+                <td class="num good">20.43</td>
+                <td>已匹配</td>
+                <td class="num">¥40 / 23.56</td>
+                <td>已匹配</td>
+                <td class="num">¥557 / 19.05</td>
+                <td>已匹配</td>
+                <td class="num">¥45 / 42.75</td>
+                <td>放量周期：D1-D3；峰值贡献：45.0%；前4天贡献：74.2%；长尾贡献：25.8%；生命周期：15天</td>
+              </tr>
+            
+              <tr>
+                <td>7</td>
+                <td>没有弯弯绕绕，预热也给大家直降不啰嗦 #名媛风  #少女感 #小心机 #夏日穿搭</td>
+                <td>2026-05-15 19:00:00</td>
+                <td>合集 / D18628603 D18628693 D18628142 D18628030 D18628603 D18628429 F18627612 F18528119H1 F18627612</td>
+                <td class="num">¥2,807</td>
+                <td class="num">¥63,712</td>
+                <td class="num good">22.70</td>
+                <td>已匹配</td>
+                <td class="num">¥6 / 58.18</td>
+                <td>已匹配</td>
+                <td class="num">¥162 / 18.53</td>
+                <td>已匹配</td>
+                <td class="num">¥137 / 14.85</td>
+                <td>放量周期：D1-D9；峰值贡献：19.2%；前4天贡献：36.2%；长尾贡献：63.8%；生命周期：15天</td>
+              </tr>
+            
+              <tr>
+                <td>8</td>
+                <td>夏天怕热怕闷的姐妹看过来！ #上班穿搭 #春夏搭配 #法式穿搭 #面料柔软舒适 #谁穿谁好看</td>
+                <td>2026-05-13 12:08:44</td>
+                <td>针织衫 / D18628142 D18628693</td>
+                <td class="num">¥2,391</td>
+                <td class="num">¥63,090</td>
+                <td class="num good">26.38</td>
+                <td>已匹配</td>
+                <td class="num">¥4 / 0.00</td>
+                <td>未匹配</td>
+                <td class="num">¥3 / 52.72</td>
+                <td>已匹配</td>
+                <td class="num">¥9 / 86.93</td>
+                <td>放量周期：D8-D11；峰值贡献：27.3%；前4天贡献：2.4%；长尾贡献：97.6%；生命周期：15天</td>
+              </tr>
+            
+              <tr>
+                <td>9</td>
+                <td>风一吹，上身是凉快的舒服的#夏季新款 #面料舒适透气 #遮肉显瘦 #谁穿谁好看</td>
+                <td>2026-05-25 22:40:05</td>
+                <td>针织衫 / D18628693</td>
+                <td class="num">¥1,713</td>
+                <td class="num">¥39,923</td>
+                <td class="num good">23.31</td>
+                <td>无直播</td>
+                <td class="num">¥0 / -</td>
+                <td>已匹配</td>
+                <td class="num">¥385 / 24.37</td>
+                <td>主推款未填</td>
+                <td class="num">¥188 / 20.46</td>
+                <td>放量周期：D3-D5；峰值贡献：24.5%；前4天贡献：12.8%；长尾贡献：87.2%；生命周期：14天</td>
+              </tr>
+            
+              <tr>
+                <td>10</td>
+                <td>岁月无声，用心活着，自带光芒 #日系甜美 #小个穿搭 #度假穿搭 #微胖穿搭</td>
+                <td>2026-05-15 19:30:00</td>
+                <td>针织衫 / D18628142 D18628693</td>
+                <td class="num">¥1,140</td>
+                <td class="num">¥28,485</td>
+                <td class="num good">24.99</td>
+                <td>未匹配</td>
+                <td class="num">¥9 / 20.88</td>
+                <td>已匹配</td>
+                <td class="num">¥53 / 22.18</td>
+                <td>已匹配</td>
+                <td class="num">¥147 / 32.82</td>
+                <td>放量周期：D4-D9；峰值贡献：26.0%；前4天贡献：7.9%；长尾贡献：92.1%；生命周期：14天</td>
+              </tr>
+            
+          </tbody>
+        </table>
+      </div>
+      <p class="note">说明：每日数据来自本地已抓取的 2026-04-01 至 2026-06-08 快照；5月直播主推款来自后台 room/config/get 的 productCodes 字段。短视频消耗占比 = 该视频在阶段内的消耗 ÷ 阶段覆盖日期内全部短视频消耗；成交占比 = 该视频在阶段内的GMV ÷ 阶段覆盖日期内全部短视频GMV。直播承接口径为：后台手动填写的「主推款」货号，能对上视频里的任一款式货号，即算这场直播承接成功。</p>
+    </section>
+  </main>
+</body>
+</html>

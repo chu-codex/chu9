@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>5月直播间短视频投放复盘</title>
+<style>
+:root{
+  --bg:#f4f6f8;
+  --panel:#ffffff;
+  --ink:#172033;
+  --muted:#667085;
+  --line:#d8dee8;
+  --nav:#0d1b2a;
+  --blue:#2563eb;
+  --green:#14804a;
+  --red:#d33b4c;
+  --amber:#a96700;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font:14px/1.72 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif;
+}
+.layout{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:100vh}
+.side{
+  position:sticky;
+  top:0;
+  height:100vh;
+  overflow:auto;
+  background:var(--nav);
+  color:#dbeafe;
+  padding:26px 16px;
+}
+.brand{font-size:20px;font-weight:800;color:#fff;line-height:1.25;margin-bottom:18px}
+.brand small{display:block;color:#93c5fd;font-size:12px;font-weight:600;margin-top:8px}
+.toc a{
+  display:block;
+  color:#dbeafe;
+  text-decoration:none;
+  border-radius:8px;
+  padding:8px 10px;
+  margin:3px 0;
+}
+.toc a:hover{background:#213047}
+.toc-l2{font-size:13px;padding-left:22px!important;color:#b7c9e8!important}
+.main{min-width:0;padding:30px}
+.report{
+  max-width:1280px;
+  margin:0 auto;
+}
+.hero{
+  background:linear-gradient(135deg,#ffffff 0%,#eef6ff 100%);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:28px 30px;
+  margin-bottom:16px;
+}
+.hero h1{margin:0 0 8px;font-size:30px;line-height:1.25}
+.hero p{margin:0;color:var(--muted)}
+.content{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:26px 30px;
+}
+h1,h2,h3{letter-spacing:0;margin:22px 0 10px;line-height:1.35}
+h1{font-size:28px}
+h2{font-size:21px;border-left:4px solid var(--blue);padding-left:10px}
+h3{font-size:17px;color:#24324a}
+p{margin:8px 0 12px}
+hr{border:0;border-top:1px solid var(--line);margin:24px 0}
+ul{margin:8px 0 14px;padding-left:20px}
+li{margin:4px 0}
+code{background:#eef2f7;border:1px solid #d8dee8;border-radius:5px;padding:1px 5px}
+.table-wrap{
+  overflow:auto;
+  border:1px solid var(--line);
+  border-radius:8px;
+  margin:10px 0 16px;
+}
+table{border-collapse:collapse;width:100%;min-width:780px;background:#fff}
+th,td{
+  border-bottom:1px solid var(--line);
+  padding:9px 11px;
+  text-align:left;
+  vertical-align:top;
+  white-space:nowrap;
+}
+th{background:#f8fafc;color:#475467;font-weight:800}
+tr:last-child td{border-bottom:0}
+td:nth-child(n+3),th:nth-child(n+3){text-align:right}
+.content > h1:first-child{display:none}
+.content > p:nth-child(2),
+.content > p:nth-child(3){
+  color:var(--muted);
+  background:#f8fafc;
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:10px 12px;
+}
+.trend-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+  margin:12px 0 16px;
+}
+.chart-card{
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:#fbfcfe;
+  padding:14px;
+  min-width:0;
+}
+.chart-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+  margin-bottom:8px;
+}
+.chart-head h4{
+  margin:0;
+  font-size:16px;
+  line-height:1.3;
+}
+.chart-head p{
+  margin:4px 0 0;
+  color:var(--muted);
+  font-size:12px;
+}
+.chart-legend{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  gap:8px 12px;
+  color:#475467;
+  font-size:12px;
+  white-space:nowrap;
+}
+.chart-legend i{
+  display:inline-block;
+  width:9px;
+  height:9px;
+  border-radius:999px;
+  margin-right:5px;
+}
+.trend-chart{
+  display:block;
+  width:100%;
+  height:auto;
+  background:#fff;
+  border:1px solid #edf0f5;
+  border-radius:8px;
+}
+.trend-chart .grid line{stroke:#e7ecf3;stroke-width:1}
+.trend-chart .series path{
+  fill:none;
+  stroke-width:3.2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.trend-chart .axis text{
+  fill:#667085;
+  font-size:11px;
+}
+.chart-notes{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin-top:10px;
+}
+.chart-notes b,
+.chart-notes span{
+  display:block;
+}
+.chart-notes b{
+  color:#667085;
+  font-size:12px;
+  font-weight:700;
+}
+.chart-notes span{
+  color:#172033;
+  font-size:13px;
+  font-weight:800;
+}
+@media(max-width:980px){
+  .layout{grid-template-columns:1fr}
+  .side{position:relative;height:auto}
+  .main{padding:16px}
+  .content{padding:18px 14px}
+  .hero{padding:22px 18px}
+  .trend-grid{grid-template-columns:1fr}
+  .chart-head{display:block}
+  .chart-legend{justify-content:flex-start;margin-top:8px}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="side">
+    <div class="brand">5月直播间短视频投放复盘<small>按原大纲生成 / 脚本类型口径</small></div>
+    <nav class="toc"><a class="toc-l1" href="#5月直播间短视频投放复盘">5月直播间短视频投放复盘</a>
+<a class="toc-l1" href="#一-整体投放结果">一、整体投放结果</a>
+<a class="toc-l2" href="#投放概览">投放概览</a>
+<a class="toc-l1" href="#二-核心素材综合分析">二、核心素材综合分析</a>
+<a class="toc-l2" href="#top核心素材">TOP核心素材</a>
+<a class="toc-l2" href="#素材重合结论">素材重合结论</a>
+<a class="toc-l2" href="#类目分析">类目分析</a>
+<a class="toc-l2" href="#脚本类型分析">脚本类型分析</a>
+<a class="toc-l2" href="#场景分析">场景分析</a>
+<a class="toc-l2" href="#高效素材模型">高效素材模型</a>
+<a class="toc-l1" href="#三-货品表现分析">三、货品表现分析</a>
+<a class="toc-l1" href="#四-投放天数复盘">四、投放天数复盘</a>
+<a class="toc-l2" href="#投放天数表现">投放天数表现</a>
+<a class="toc-l1" href="#五-问题复盘">五、问题复盘</a>
+<a class="toc-l2" href="#问题1-过度依赖针织衫单品">问题1：过度依赖针织衫单品</a>
+<a class="toc-l2" href="#问题2-薄荷衫roi低于保本">问题2：薄荷衫ROI低于保本</a>
+<a class="toc-l2" href="#问题3-高ctr素材不一定高成交">问题3：高CTR素材不一定高成交</a>
+<a class="toc-l1" href="#六-6月投放策略">六、6月投放策略</a>
+<a class="toc-l2" href="#素材策略">素材策略</a>
+<a class="toc-l2" href="#货品策略">货品策略</a>
+<a class="toc-l2" href="#预算策略">预算策略</a>
+<a class="toc-l1" href="#七-一页总结-老板版">七、一页总结（老板版）</a>
+<a class="toc-l2" href="#5月核心结论">5月核心结论</a>
+<a class="toc-l2" href="#6月核心动作">6月核心动作</a>
+<a class="toc-l1" href="#复盘核心回答">复盘核心回答</a></nav>
+  </aside>
+  <main class="main">
+    <div class="report">
+      <section class="hero">
+        <h1>5月直播间短视频投放复盘</h1>
+        <p>数据范围：2026-05-01 至 2026-05-31。内容按你给的大纲排列，脚本类型取作品库「脚本类型」字段。</p>
+      </section>
+      <article class="content">
+<h1 id="5月直播间短视频投放复盘">5月直播间短视频投放复盘</h1>
+<p>数据范围：2026-05-01 至 2026-05-31 口径说明：本复盘以直播间投流明细中的「直播画面/短视频」拆分为主口径；整体消耗包含直播画面、短视频及其他差额。4月数据已按同口径同步，用于环比；当前本地仍未提供计划类型标签、素材D1/D3/D7/D15逐日归因字段，因此相关位置先标注为「待补」或用现有字段做替代判断。</p>
+<hr>
+<h1 id="一-整体投放结果">一、整体投放结果</h1>
+<h2 id="投放概览">投放概览</h2>
+<div class="table-wrap"><table><thead><tr><th>指标</th><th>5月数据</th><th>环比4月</th></tr></thead><tbody><tr><td>总消耗（直播画面+短视频+其他）</td><td>¥267,175</td><td>+¥18,629 / +7.5%</td></tr><tr><td>直播画面消耗</td><td>¥154,377</td><td>+¥3,775 / +2.5%</td></tr><tr><td>短视频消耗</td><td>¥109,985</td><td>+¥13,735 / +14.3%</td></tr><tr><td>其他差额</td><td>¥2,814</td><td>+¥1,118 / +65.9%</td></tr><tr><td>总成交GMV</td><td>¥13,739,826</td><td>+¥2,946,811 / +27.3%</td></tr><tr><td>整体ROI</td><td>51.43</td><td>+8.00 / +18.4%</td></tr><tr><td>总进房人数</td><td>310,201</td><td>+73,031 / +30.8%</td></tr><tr><td>短视频消耗占比</td><td>41.2%</td><td>+2.4pct</td></tr><tr><td>直播直投占比</td><td>57.8%</td><td>-2.8pct</td></tr></tbody></table></div>
+<p>拆分口径：5月直播画面消耗 ¥154,377，直播画面GMV ¥10,466,878，直播画面ROI 67.80；短视频消耗 ¥109,985，短视频成交GMV ¥2,410,578，短视频ROI 21.92，订单 15,139，曝光 7,313,515，CTR 4.24%，CVR 4.88%。</p>
+<h3 id="趋势分析">趋势分析</h3>
+<div class="trend-grid">
+    <section class="chart-card">
+    <div class="chart-head">
+      <div><h4>投放规模、成交与效率趋势</h4><p>短视频消耗、短视频GMV、短视频ROI合并观察，看放量、成交和效率是否同步。</p></div>
+      <div class="chart-legend"><span><i style="background:#2563eb"></i>短视频消耗</span><span><i style="background:#14a38b"></i>短视频GMV</span><span><i style="background:#e05a47"></i>短视频ROI</span></div>
+    </div>
+    <svg class="trend-chart" viewBox="0 0 920 260" role="img" aria-label="投放规模、成交与效率趋势">
+      <g class="grid"><line x1="44" x2="894" y1="24" y2="24" /><line x1="44" x2="894" y1="74.5" y2="74.5" /><line x1="44" x2="894" y1="125" y2="125" /><line x1="44" x2="894" y1="175.5" y2="175.5" /><line x1="44" x2="894" y1="226" y2="226" /></g>
+      <g class="series"><path d="M44.0,195.6 L72.3,207.4 L100.7,207.5 L129.0,214.8 L157.3,188.7 L185.7,202.5 L214.0,212.3 L242.3,190.1 L270.7,226.0 L299.0,216.3 L327.3,151.4 L355.7,188.7 L384.0,190.4 L412.3,157.7 L440.7,179.1 L469.0,172.4 L497.3,160.7 L525.7,185.9 L554.0,165.0 L582.3,124.0 L610.7,94.0 L639.0,77.5 L667.3,65.2 L695.7,24.0 L724.0,92.0 L752.3,150.1 L780.7,162.3 L809.0,154.7 L837.3,124.4 L865.7,156.6 L894.0,149.1" stroke="#2563eb" /><path d="M44.0,199.7 L72.3,205.7 L100.7,214.9 L129.0,220.3 L157.3,187.3 L185.7,205.7 L214.0,212.0 L242.3,212.8 L270.7,226.0 L299.0,215.6 L327.3,153.4 L355.7,192.1 L384.0,199.1 L412.3,175.4 L440.7,188.9 L469.0,172.8 L497.3,173.0 L525.7,192.7 L554.0,175.6 L582.3,139.2 L610.7,89.8 L639.0,91.7 L667.3,33.4 L695.7,24.0 L724.0,87.5 L752.3,136.1 L780.7,144.8 L809.0,154.7 L837.3,133.9 L865.7,153.3 L894.0,146.2" stroke="#14a38b" /><path d="M44.0,132.0 L72.3,106.3 L100.7,174.3 L129.0,179.0 L157.3,95.7 L185.7,134.9 L214.0,122.4 L242.3,226.0 L270.7,156.9 L299.0,124.9 L327.3,96.7 L355.7,121.1 L384.0,151.4 L412.3,153.3 L440.7,143.0 L469.0,97.6 L497.3,136.4 L525.7,136.0 L554.0,133.5 L582.3,124.1 L610.7,73.2 L639.0,107.2 L667.3,24.0 L695.7,77.5 L724.0,72.4 L752.3,44.5 L780.7,28.3 L809.0,90.4 L837.3,109.8 L865.7,79.9 L894.0,80.1" stroke="#e05a47" /></g>
+      <g class="axis"><text x="44" y="250" text-anchor="middle">05-01</text><text x="185.66666666666666" y="250" text-anchor="middle">05-06</text><text x="327.3333333333333" y="250" text-anchor="middle">05-11</text><text x="469" y="250" text-anchor="middle">05-16</text><text x="610.6666666666666" y="250" text-anchor="middle">05-21</text><text x="752.3333333333334" y="250" text-anchor="middle">05-26</text><text x="894" y="250" text-anchor="middle">05-31</text></g>
+    </svg>
+    <div class="chart-notes"><b>消耗峰值</b><span>05-24 ¥8,954</span><b>GMV峰值</b><span>05-24 ¥211,777</span><b>ROI峰值</b><span>05-23 27.67</span></div>
+  </section>
+  </div>
+<ul><li>日消耗趋势：5月前半月短视频消耗较平稳，5月20日后明显放量；5月24日达到单日最高消耗 ¥8,954。</li><li>日成交趋势：成交随放量提升，5月23日GMV ¥202,693，5月24日GMV ¥211,777，为月内峰值区间。</li><li>ROI趋势：全月短视频ROI 21.92，高于保本ROI 12；5月23日ROI 27.67，为月内最佳日。</li></ul>
+<h3 id="核心结论">核心结论</h3>
+<ul><li>5月整体投流规模：整体消耗约26.72万，其中直播画面消耗约15.44万、短视频消耗约11.00万，短视频已成为直播间重要流量入口。</li><li>效率：短视频ROI 21.92，高于保本线，证明短视频不只是拉人，也能贡献成交。</li><li>核心增长来源：相较4月，5月整体GMV增长约294.68万，短视频GMV增长约71.26万；货品侧主要来自针织衫，尤其是 D18628693 系列。</li></ul>
+<hr>
+<h1 id="二-核心素材综合分析">二、核心素材综合分析</h1>
+<h2 id="top核心素材">TOP核心素材</h2>
+<p>引流、成交、跑量TOP素材高度重合，因此合并为同一张综合表观察：同一条素材同时看进房、GMV、消耗、ROI和CTR。</p>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>视频</th><th>款式/货号</th><th>消耗</th><th>GMV</th><th>进房人数</th><th>ROI</th><th>CTR</th><th>订单数</th><th>判断</th></tr></thead><tbody><tr><td>1</td><td>谁都不缺衣服，缺的是换装的好心情</td><td>D18628693 / 针织衫</td><td>¥12,147</td><td>¥289,790</td><td>28,943</td><td>23.86</td><td>4.00%</td><td>1,815</td><td>引流+成交+跑量</td></tr><tr><td>2</td><td>怕热的姐妹，一定要入这款凉感面料</td><td>D18628693 / 针织衫</td><td>¥10,318</td><td>¥280,632</td><td>23,651</td><td>27.20</td><td>2.90%</td><td>1,759</td><td>成交效率强</td></tr><tr><td>3</td><td>简约大气不挑人，上班穿得体又高级</td><td>D18628693 / 针织衫</td><td>¥9,009</td><td>¥181,831</td><td>13,149</td><td>20.18</td><td>3.54%</td><td>1,135</td><td>稳定成交</td></tr><tr><td>4</td><td>压力可以放一放，快乐不能缺席</td><td>D18628142 / 针织短袖</td><td>¥4,144</td><td>¥92,878</td><td>13,595</td><td>22.41</td><td>7.17%</td><td>571</td><td>高CTR补充款</td></tr><tr><td>5</td><td>颜色很克制，线条很干净</td><td>D18628693 / 针织衫</td><td>¥4,294</td><td>¥86,232</td><td>8,514</td><td>20.08</td><td>3.80%</td><td>537</td><td>稳定跑量</td></tr><tr><td>6</td><td>穿的舒服了，人就松弛了</td><td>D18628693 / 针织衫</td><td>¥3,157</td><td>¥64,504</td><td>7,356</td><td>20.43</td><td>4.17%</td><td>406</td><td>稳定成交</td></tr><tr><td>7</td><td>没有弯弯绕绕，预热也给大家直降</td><td>合集 / 多款</td><td>¥2,807</td><td>¥63,712</td><td>15,598</td><td>22.70</td><td>10.44%</td><td>399</td><td>强点击引流</td></tr><tr><td>8</td><td>夏天怕热怕闷的姐妹看过来</td><td>D18628693 / 针织衫</td><td>¥2,391</td><td>¥63,090</td><td>5,895</td><td>26.38</td><td>5.09%</td><td>395</td><td>高ROI复刻</td></tr><tr><td>9</td><td>被问爆的夏日宝藏，天丝亚麻针织衫</td><td>D18628693 / 针织衫</td><td>¥2,716</td><td>¥51,254</td><td>5,846</td><td>18.87</td><td>4.81%</td><td>317</td><td>可继续测试</td></tr><tr><td>10</td><td>风一吹，上身是凉快舒服的</td><td>D18628693 / 针织衫</td><td>¥1,713</td><td>¥39,923</td><td>4,529</td><td>23.31</td><td>4.99%</td><td>251</td><td>小量高效</td></tr></tbody></table></div>
+<p>注：TOP表按“货号 + 类目”展示，方便定位具体跑量款；下方分析按类目、脚本、场景归纳。</p>
+<h2 id="素材重合结论">素材重合结论</h2>
+<ul><li>TOP引流、TOP成交、TOP跑量的主力素材基本重合，说明5月不是“拉人素材”和“卖货素材”分离，而是同一批素材同时完成引流、成交和放量。</li><li>最强综合素材是“谁都不缺衣服，缺的是换装的好心情”：进房 28,943、GMV ¥289,790、消耗 ¥12,147、ROI 23.86，三项能力都强。</li><li>“怕热的姐妹，一定要入这款凉感面料”成交效率更强，ROI 27.20，适合重点复刻“夏季痛点 + 面料证明”结构。</li><li>“没有弯弯绕绕，预热也给大家直降”CTR 10.44%，说明活动/机制型内容拉人强，但CVR偏弱，后续要加强同款承接。</li></ul>
+<h2 id="类目分析">类目分析</h2>
+<ul><li>针织衫：TOP10里占8条，是5月核心类目；既能引流，也能成交和跑量。</li><li>针织短袖：CTR 7.17%，进房 13,595，适合作为夏季舒适/凉感补充类目。</li><li>合集：点击强、引流强，但用户进房后购买路径更分散，需要拆到明确单款或明确类目承接。</li><li>衬衫/防晒衬衫：未进入TOP综合素材主力，说明当前防晒衬衫需要补更强的首屏卖点和直播间承接。</li></ul>
+<h2 id="脚本类型分析">脚本类型分析</h2>
+<p>脚本类型使用作品库字段 detail.scriptType，即页面里的“脚本类型”列。5月投放明细共 9,365 行，作品库命中 8,998 行，命中率 96.1%。</p>
+<div class="table-wrap"><table><thead><tr><th>脚本类型</th><th>消耗</th><th>GMV</th><th>ROI</th><th>进房人数</th><th>CTR</th><th>CVR</th></tr></thead><tbody><tr><td>直播切片-口播</td><td>¥56,678</td><td>¥1,340,381</td><td>23.65</td><td>140,659</td><td>3.82%</td><td>5.97%</td></tr><tr><td>直播切片</td><td>¥16,233</td><td>¥292,101</td><td>17.99</td><td>38,123</td><td>5.19%</td><td>4.84%</td></tr><tr><td>直播切片-伊芙丽剪辑</td><td>¥7,413</td><td>¥149,127</td><td>20.12</td><td>20,472</td><td>4.22%</td><td>4.58%</td></tr><tr><td>直播切片-预热视频</td><td>¥6,880</td><td>¥161,319</td><td>23.45</td><td>20,298</td><td>4.09%</td><td>4.95%</td></tr><tr><td>直播切片-后台直发</td><td>¥5,284</td><td>¥97,149</td><td>18.39</td><td>14,687</td><td>4.48%</td><td>4.20%</td></tr><tr><td>高级拍剪-走拍</td><td>¥3,851</td><td>¥75,400</td><td>19.58</td><td>14,962</td><td>3.71%</td><td>3.10%</td></tr><tr><td>内容营销-机制口播</td><td>¥3,181</td><td>¥71,208</td><td>22.39</td><td>17,276</td><td>9.58%</td><td>2.58%</td></tr><tr><td>外包视频</td><td>¥975</td><td>¥8,740</td><td>8.97</td><td>2,386</td><td>3.53%</td><td>2.47%</td></tr></tbody></table></div>
+<ul><li>直播切片-口播：消耗和GMV双第一，是当前直播间短视频投放主力脚本。</li><li>直播切片-预热视频：ROI 23.45，表现接近口播，适合做直播前引流和活动承接。</li><li>内容营销-机制口播：CTR 9.58%，最能吸引点击，但CVR 2.58%，需强化进房后的同款承接。</li><li>外包视频：ROI 8.97，低于保本线，应暂停放量或重剪重测。</li></ul>
+<h2 id="场景分析">场景分析</h2>
+<p>拍摄地点来自作品库 shootLocation 字段；5月有消耗素材 6,686 行，命中拍摄地点 5,638 行，命中率 84.3%。</p>
+<div class="table-wrap"><table><thead><tr><th>拍摄地点</th><th>消耗</th><th>GMV</th><th>ROI</th><th>进房人数</th></tr></thead><tbody><tr><td>直播间</td><td>¥82,078</td><td>¥1,849,359</td><td>22.53</td><td>214,107</td></tr><tr><td>一楼门店</td><td>¥3,243</td><td>¥73,574</td><td>22.69</td><td>17,681</td></tr><tr><td>超级编导</td><td>¥1,315</td><td>¥31,839</td><td>24.22</td><td>4,477</td></tr><tr><td>即梦AI</td><td>¥1,298</td><td>¥21,748</td><td>16.76</td><td>4,887</td></tr><tr><td>公司大堂</td><td>¥1,150</td><td>¥28,041</td><td>24.38</td><td>5,864</td></tr><tr><td>公司大楼</td><td>¥1,109</td><td>¥17,715</td><td>15.97</td><td>2,048</td></tr><tr><td>商场室外</td><td>¥1,013</td><td>¥8,023</td><td>7.92</td><td>2,154</td></tr><tr><td>打卡闸机</td><td>¥808</td><td>¥18,079</td><td>22.38</td><td>4,066</td></tr></tbody></table></div>
+<ul><li>直播间：消耗和进房绝对主力，ROI 22.53，说明直播切片/直播间讲款是5月最稳定引流场景。</li><li>一楼门店：ROI 22.69，进房 17,681，具备放量潜力，适合继续复刻“门店真实试穿/上身展示”。</li><li>公司大堂、超级编导、打卡闸机：ROI均高于20，可作为补充场景，但当前消耗体量偏小，需要继续放大验证。</li><li>商场室外：ROI 7.92，低于保本线，当前不适合作为主放量场景。</li></ul>
+<h2 id="高效素材模型">高效素材模型</h2>
+<p>5月最有效的视频不是单纯“高点击”或“高成交”，而是“夏季痛点 + 明确款式 + 直播间/门店真实展示 + 面料证明 + 同款承接”。</p>
+<ul><li>最能拉人：夏季痛点明确、标题有情绪或利益点、CTR能拉起的素材。</li><li>最能卖货：面料、版型、显瘦、凉感证明充分，直播间能直接承接同款的素材。</li><li>最容易跑量：消耗放大后ROI仍能稳在20以上，且进房和订单同步增长的素材。</li></ul>
+<hr>
+<h1 id="三-货品表现分析">三、货品表现分析</h1>
+<div class="table-wrap"><table><thead><tr><th>类目</th><th>消耗</th><th>成交</th><th>ROI</th><th>进房人数</th></tr></thead><tbody><tr><td>针织衫</td><td>¥72,282</td><td>¥1,648,007</td><td>22.80</td><td>187,142</td></tr><tr><td>衬衫</td><td>¥20,188</td><td>¥364,452</td><td>18.05</td><td>57,172</td></tr><tr><td>针织短袖</td><td>¥7,306</td><td>¥146,510</td><td>20.05</td><td>20,498</td></tr><tr><td>其他/合集</td><td>¥3,108</td><td>¥71,915</td><td>23.14</td><td>17,331</td></tr><tr><td>半身裙</td><td>¥2,186</td><td>¥87,118</td><td>39.85</td><td>10,510</td></tr><tr><td>薄荷衫</td><td>¥1,355</td><td>¥11,449</td><td>8.45</td><td>3,098</td></tr></tbody></table></div>
+<h3 id="输出结论">输出结论</h3>
+<ul><li>最适合引流：针织衫、合集、针织短袖。针织衫进房规模最大，合集CTR高但CVR偏弱。</li><li>最适合成交：针织衫、半身裙。针织衫贡献大盘，半身裙ROI高但需扩大样本。</li><li>最适合放量：针织衫D18628693，已验证消耗、GMV、ROI、进房均稳定。</li></ul>
+<hr>
+<h1 id="四-投放天数复盘">四、投放天数复盘</h1>
+<p>本节用「投放天数、覆盖直播间、月度ROI」判断素材是否具备持续投放能力。</p>
+<h2 id="投放天数表现">投放天数表现</h2>
+<div class="table-wrap"><table><thead><tr><th>素材</th><th>投放天数</th><th>覆盖直播间</th><th>月度ROI</th><th>复盘判断</th></tr></thead><tbody><tr><td>压力可以放一放，快乐不能缺席</td><td>27</td><td>174</td><td>22.41</td><td>长周期稳定素材</td></tr><tr><td>谁都不缺衣服，缺的是换装的好心情</td><td>12</td><td>76</td><td>23.86</td><td>可继续放量</td></tr><tr><td>怕热的姐妹，一定要入这款凉感面料</td><td>11</td><td>74</td><td>27.20</td><td>高ROI放量素材</td></tr><tr><td>简约大气不挑人，上班穿得体又高级</td><td>11</td><td>70</td><td>20.18</td><td>稳定成交素材</td></tr></tbody></table></div>
+<h3 id="天数分层">天数分层</h3>
+<ul><li>1-3天：完成初筛，重点看CTR、进房、成交是否跑出基础反馈；不达标及时停投或重剪。</li><li>3-5天：进入放量判断期，如果ROI高于保本线，且进房和成交同步提升，可加预算测试。</li><li>5-7天：判断素材是否具备稳定承接能力，适合开始复刻同结构新素材。</li><li>7天以上：说明素材已经具备持续投放能力，但要重点监控CTR和CVR是否衰退。</li></ul>
+<h3 id="输出结论">输出结论</h3>
+<p>5月素材判断不需要等到10天，正常应在1-3天完成初筛、3-5天决定是否加预算、5-7天判断是否复刻。当前能跑到10天以上的素材，说明已经通过多轮投放验证；其中“压力可以放一放，快乐不能缺席”投放27天、覆盖174个直播间，仍保持ROI 22.41，是长周期素材代表；“怕热的姐妹”和“换装好心情”虽然投放天数略短，但ROI和成交效率更强，适合继续复刻放量。</p>
+<hr>
+<h1 id="五-问题复盘">五、问题复盘</h1>
+<h2 id="问题1-过度依赖针织衫单品">问题1：过度依赖针织衫单品</h2>
+<h3 id="现象">现象</h3>
+<p>针织衫消耗 ¥72,282，占短视频消耗大头；D18628693 单款消耗 ¥45,486，GMV ¥1,075,624。</p>
+<h3 id="原因分析">原因分析</h3>
+<p>针织衫同时承接夏季凉感、显瘦、通勤、面料舒适多个卖点，短视频表达空间大，直播间也容易承接。</p>
+<h3 id="优化方案">优化方案</h3>
+<p>继续放量针织衫，但要同步复刻衬衫、针织短袖、半身裙的高ROI结构，避免单款疲劳。</p>
+<h2 id="问题2-薄荷衫roi低于保本">问题2：薄荷衫ROI低于保本</h2>
+<h3 id="现象">现象</h3>
+<p>薄荷衫消耗 ¥1,355，GMV ¥11,449，ROI 8.45，低于保本ROI 12。</p>
+<h3 id="原因分析">原因分析</h3>
+<p>当前薄荷衫更像出游/情绪种草，成交证明不足，直播间承接可能弱。</p>
+<h3 id="优化方案">优化方案</h3>
+<p>暂停放量，改为小预算测新脚本：显白、凉感、防晒/通勤、不同身材上身对比。</p>
+<h2 id="问题3-高ctr素材不一定高成交">问题3：高CTR素材不一定高成交</h2>
+<h3 id="现象">现象</h3>
+<p>合集素材CTR 10.44%，进房15,598，但CVR 2.56%，低于针织衫主力素材。</p>
+<h3 id="原因分析">原因分析</h3>
+<p>活动/合集能拉人，但用户进房后购买路径分散，缺少明确同款承接。</p>
+<h3 id="优化方案">优化方案</h3>
+<p>高CTR低CVR素材用于引流可以保留，但直播间必须把主推款、价格机制、尺码承接讲清楚。</p>
+<hr>
+<h1 id="六-6月投放策略">六、6月投放策略</h1>
+<h2 id="素材策略">素材策略</h2>
+<p>继续放量：</p>
+<ul><li>D18628693 针织衫相关高ROI素材</li><li>“怕热/凉感/不闷”夏季痛点素材</li><li>“弹力/不透/显瘦”证明动作素材</li></ul>
+<p>重点复刻：</p>
+<ul><li>高引流素材：换装好心情、怕热姐妹、预热直降</li><li>高成交素材：凉感面料、通勤得体、显瘦背薄</li></ul>
+<p>停止：</p>
+<ul><li>高消耗低ROI素材</li><li>薄荷衫当前低ROI脚本</li><li>高CTR但直播间无明确承接的泛活动素材</li></ul>
+<h2 id="货品策略">货品策略</h2>
+<p>重点支持：</p>
+<ul><li>成交贡献TOP货品：针织衫D18628693</li><li>高引流货品：针织衫、合集、针织短袖</li><li>高ROI机会货品：半身裙</li></ul>
+<h2 id="预算策略">预算策略</h2>
+<p>测试计划：30% 放量计划：50% 稳定成交计划：20%</p>
+<p>具体分配建议：</p>
+<ul><li>50%给D18628693针织衫及其复刻素材。</li><li>20%给针织短袖/衬衫的夏季通勤脚本。</li><li>15%给半身裙高ROI机会款。</li><li>15%做新钩子测试，包括薄荷衫重拍、户外防晒、办公室通勤。</li></ul>
+<hr>
+<h1 id="七-一页总结-老板版">七、一页总结（老板版）</h1>
+<h2 id="5月核心结论">5月核心结论</h2>
+<p>1. 最强引流素材：谁都不缺衣服，缺的是换装的好心情，进房 28,943。 2. 最强成交素材：谁都不缺衣服，缺的是换装的好心情，GMV ¥289,790；“怕热姐妹”紧随其后，GMV ¥280,632且ROI 27.20。 3. 最强跑量素材：谁都不缺衣服，缺的是换装的好心情，消耗 ¥12,147，ROI 23.86。 4. 最优货品：针织衫D18628693，款式GMV ¥1,075,624，ROI 23.65。 5. 最大问题：货品和素材结构集中度高，薄荷衫等非主力货品暂未跑出成交效率。</p>
+<h2 id="6月核心动作">6月核心动作</h2>
+<p>继续做：</p>
+<ul><li>针织衫D18628693放量</li><li>凉感、透气、显瘦、弹力证明型素材</li></ul>
+<p>停止做：</p>
+<ul><li>低ROI薄荷衫原脚本</li><li>没有同款承接的泛活动素材</li></ul>
+<p>重点复刻：</p>
+<ul><li>运动作证明：拉伸、不透、风吹、贴肤</li><li>人群痛点：怕热、通勤、显瘦背薄、小个子</li></ul>
+<p>重点测试：</p>
+<ul><li>半身裙高ROI素材扩量</li><li>衬衫通勤/防晒脚本</li><li>薄荷衫新卖点重拍</li></ul>
+<p>预算倾斜：</p>
+<ul><li>50%给已验证主力针织衫</li><li>30%做新素材和新货品测试</li><li>20%守稳定成交计划</li></ul>
+<hr>
+<h1 id="复盘核心回答">复盘核心回答</h1>
+<p>1. 什么视频最能拉人？</p>
+<p>夏季痛点明确、首屏有动作证明、能让用户进直播间确认尺码和上身效果的视频最能拉人。代表素材是“谁都不缺衣服，缺的是换装的好心情”。</p>
+<p>2. 什么视频最能卖货？</p>
+<p>能把痛点、面料证明、上身效果和直播间承接串起来的视频最能卖货。代表素材是“怕热的姐妹，一定要入这款凉感面料”和“简约大气不挑人，上班穿得体又高级”。</p>
+<p>3. 什么视频最容易跑量？</p>
+<p>大人群痛点 + 强视觉证明 + ROI守得住的视频最容易跑量。针织衫D18628693相关素材是5月最稳定跑量模型。</p>
+<p>4. 什么货最值得继续投？</p>
+<p>针织衫D18628693最值得继续投；半身裙ROI高，适合扩大测试；衬衫可保留但需要优化脚本效率；薄荷衫暂缓放量。</p>
+<p>5. 6月预算应该投给谁？</p>
+<p>预算优先给针织衫D18628693及其复刻素材，其次给针织短袖/衬衫的夏季通勤脚本，再用小预算测试半身裙和薄荷衫新脚本。</p>
+      </article>
+    </div>
+  </main>
+</div>
+</body>
+</html>
